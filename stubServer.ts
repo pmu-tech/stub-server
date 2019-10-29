@@ -38,9 +38,10 @@ const isUrl = (str: string) => str.startsWith('http');
 
 let _configPath: string;
 
-const getConfig = async () => {
+const getConfig = () => {
   deleteRequireCache(_configPath);
-  return (await import(_configPath)).default as StubServerConfig;
+  // eslint-disable-next-line import/no-dynamic-require, global-require
+  return require(_configPath).default as StubServerConfig;
 };
 
 // FIXME See [proxy multipart request](https://github.com/villadora/express-http-proxy/issues/127)
@@ -58,7 +59,7 @@ async function processStubRequest(apiPath: string, req: express.Request, res: ex
   // Re-read the config file for each new request so the user
   // don't have to restart the stub server
   // except if he adds a new route which is acceptable
-  const { minDelay, maxDelay, routes } = await getConfig();
+  const { minDelay, maxDelay, routes } = getConfig();
   const response = routes[apiPath][req.method.toLowerCase() as Method]!;
 
   console.log(`${req.method} ${req.url} => ${response}`);
@@ -97,10 +98,13 @@ async function processStubRequest(apiPath: string, req: express.Request, res: ex
   }
 }
 
-export async function stubServer(configPath: string, app: express.Application) {
+export function stubServer(configPath: string, app: express.Application) {
+  // Do not use asynchronous code here otherwise routes will
+  // be defined after the ones from webpack-dev-server
+
   _configPath = configPath;
 
-  const { rootApiPath, routes } = await getConfig();
+  const { rootApiPath, routes } = getConfig();
 
   Object.entries(routes).forEach(([apiPath, route]) => {
     Object.entries(route).forEach(([method]) => {
