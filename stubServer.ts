@@ -81,8 +81,8 @@ async function processStubRequest(apiPath: string, req: express.Request, res: ex
     } else {
       const filePath = `${stubsPath}/${response}`;
 
-      if (response.endsWith('.ts') || response.endsWith('.json')) {
-        // Can load .json or .ts files
+      if (response.endsWith('.json') || response.endsWith('.js') || response.endsWith('.ts')) {
+        // Can load .json, .js or .ts files
         deleteRequireCache(filePath);
         fileContent = (await import(filePath)).default;
       } else {
