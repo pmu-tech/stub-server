@@ -38,17 +38,17 @@ const isUrl = (str: string) => str.startsWith('http');
 
 let _configPath: string;
 
-const getConfig = () => {
+function getConfig() {
   deleteRequireCache(_configPath);
   // eslint-disable-next-line import/no-dynamic-require, global-require
   return require(_configPath).default as StubServerConfig;
-};
+}
 
 // FIXME See [proxy multipart request](https://github.com/villadora/express-http-proxy/issues/127)
-const isMultipartRequest = (req: express.Request) => {
+function isMultipartRequest(req: express.Request) {
   const contentTypeHeader = req.headers['content-type'];
   return contentTypeHeader && contentTypeHeader.indexOf('multipart') > -1;
-};
+}
 
 const sendToProxy = (target: string, req: express.Request, res: express.Response) =>
   new Promise<void>(resolve =>
