@@ -1,7 +1,6 @@
 import express from 'express';
 import assert from 'assert';
 import fs from 'fs';
-import path from 'path';
 import proxy from 'express-http-proxy';
 
 type Method = 'get' | 'post' | 'put' | 'patch' | 'delete';
@@ -13,13 +12,12 @@ type Route = {
 };
 
 export interface StubServerConfig {
+  stubsPath: string;
   minDelay: number;
   maxDelay: number;
   rootApiPath: string;
   routes: { [apiPath: string]: Route };
 }
-
-const stubsPath = 'routes';
 
 // Allows to modify the imported files without restarting the server
 // See [node.js require() cache - possible to invalidate?](https://stackoverflow.com/a/16060619)
@@ -59,7 +57,7 @@ async function processStubRequest(apiPath: string, req: express.Request, res: ex
   // Re-read the config file for each new request so the user
   // don't have to restart the stub server
   // except if he adds a new route which is acceptable
-  const { minDelay, maxDelay, routes } = getConfig();
+  const { minDelay, maxDelay, routes, stubsPath } = getConfig();
   const response = routes[apiPath][req.method.toLowerCase() as Method]!;
 
   console.log(`${req.method} ${req.url} => ${response}`);
@@ -81,14 +79,14 @@ async function processStubRequest(apiPath: string, req: express.Request, res: ex
     if (httpStatus === 204 /* No Content */) {
       // Nothing to return
     } else {
+      const filePath = `${stubsPath}/${response}`;
+
       if (response.endsWith('.ts') || response.endsWith('.json')) {
-        // Can load .json or .ts files from the current directory
-        const filePath = `./${stubsPath}/${response}`;
+        // Can load .json or .ts files
         deleteRequireCache(filePath);
         fileContent = (await import(filePath)).default;
       } else {
         // Anything else: .html, .jpg...
-        const filePath = path.join(__dirname, stubsPath, response);
         fileContent = fs.readFileSync(filePath);
       }
     }
