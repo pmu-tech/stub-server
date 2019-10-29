@@ -36,9 +36,11 @@ const randomDelay = (min: number, max: number) =>
 
 const isUrl = (str: string) => str.startsWith('http');
 
+let _configPath: string;
+
 const getConfig = async () => {
-  deleteRequireCache('./config');
-  return (await import('./config')).default;
+  deleteRequireCache(_configPath);
+  return (await import(_configPath)).default as StubServerConfig;
 };
 
 // FIXME See [proxy multipart request](https://github.com/villadora/express-http-proxy/issues/127)
@@ -95,7 +97,9 @@ async function processStubRequest(apiPath: string, req: express.Request, res: ex
   }
 }
 
-export async function stubServer(app: express.Application) {
+export async function stubServer(configPath: string, app: express.Application) {
+  _configPath = configPath;
+
   const { rootApiPath, routes } = await getConfig();
 
   Object.entries(routes).forEach(([apiPath, route]) => {
