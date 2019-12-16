@@ -15,7 +15,6 @@ export interface StubServerConfig {
   stubsPath: string;
   minDelay: number;
   maxDelay: number;
-  rootApiPath: string;
   routes: { [apiPath: string]: Route };
 }
 
@@ -102,13 +101,11 @@ export function stubServer(configPath: string, app: express.Application) {
 
   _configPath = configPath;
 
-  const { rootApiPath, routes } = getConfig();
+  const { routes } = getConfig();
 
   Object.entries(routes).forEach(([apiPath, route]) => {
     Object.entries(route).forEach(([method]) => {
-      app[method as Method](`${rootApiPath}${apiPath}`, (req, res) =>
-        processStubRequest(apiPath, req, res)
-      );
+      app[method as Method](apiPath, (req, res) => processStubRequest(apiPath, req, res));
     });
   });
 }
