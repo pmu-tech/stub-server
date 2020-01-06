@@ -12,7 +12,6 @@ type Route = {
 };
 
 export interface StubServerConfig {
-  stubsPath: string;
   minDelay: number;
   maxDelay: number;
   routes: { [apiPath: string]: Route };
@@ -56,7 +55,7 @@ async function processStubRequest(apiPath: string, req: express.Request, res: ex
   // Re-read the config file for each new request so the user
   // don't have to restart the stub server
   // except if he adds a new route which is acceptable
-  const { minDelay, maxDelay, routes, stubsPath } = getConfig();
+  const { minDelay, maxDelay, routes } = getConfig();
   const response = routes[apiPath][req.method.toLowerCase() as Method]!;
 
   console.log(`${req.method} ${req.url} => ${response}`);
@@ -78,15 +77,15 @@ async function processStubRequest(apiPath: string, req: express.Request, res: ex
     if (httpStatus === 204 /* No Content */) {
       // Nothing to return
     } else {
-      const filePath = `${stubsPath}/${response}`;
+      const filename = response;
 
-      if (response.endsWith('.json') || response.endsWith('.js') || response.endsWith('.ts')) {
+      if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
         // Can load .json, .js or .ts files
-        deleteRequireCache(filePath);
-        fileContent = (await import(filePath)).default;
+        deleteRequireCache(filename);
+        fileContent = (await import(filename)).default;
       } else {
         // Anything else: .html, .jpg...
-        fileContent = fs.readFileSync(filePath);
+        fileContent = fs.readFileSync(filename);
       }
     }
     /* eslint-enable no-lonely-if */
