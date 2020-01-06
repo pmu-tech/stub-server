@@ -35,22 +35,23 @@ import { StubServerConfig } from '@pmu-tech/stub-server';
 
 const prod = 'https://pmu.fr';
 
+const stubsPath = path.resolve(__dirname, 'routes');
+
 const config: StubServerConfig = {
-  stubsPath: path.resolve(__dirname, 'routes'),
   minDelay: 0,
   maxDelay: 5000,
   routes: {
-    'my/api1': { get: 'my_api1_200_OK.json' },
-    'my/api2': { get: 'my_api2_200_OK.jpg' },
-    'my/api3': { post: 'my_api3_400_BadRequest_invalidField.ts' },
-    'my/api4': { post: 'my_api4_400_BadRequest_invalidField.js' },
-    'my/api5': { delete: 'my_api5_500_InternalServerError.html' },
+    'my/api1': { get: `${stubsPath}/my_api1_200_OK.json` },
+    'my/api2': { get: `${stubsPath}/my_api2_200_OK.jpg` },
+    'my/api3': { post: `${stubsPath}/my_api3_400_BadRequest_invalidField.ts` },
+    'my/api4': { post: `${stubsPath}/my_api4_400_BadRequest_invalidField.js` },
+    'my/api5': { delete: `${stubsPath}/my_api5_500_InternalServerError.html` },
     'my/api6/:id': { put: prod }
   }
 };
 
 const rootApiPath = 'https://pmu.fr/client/:clientApi';
-config.routes[`${rootApiPath}/my/api7`] = { get: 'my_api7_200_OK.json' };
+config.routes[`${rootApiPath}/my/api7`] = { get: `${stubsPath}/my_api7_200_OK.json` };
 
 export default config;
 ```
