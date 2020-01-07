@@ -1,0 +1,214 @@
+import path from 'path';
+import request from 'supertest';
+import express from 'express';
+import proxy from 'express-http-proxy';
+
+import { stubServer } from './stubServer';
+
+jest.mock('express-http-proxy');
+
+const configPath = path.resolve(__dirname, 'config-test', 'config');
+
+let app: express.Express;
+
+beforeAll(() => {
+  app = express();
+  stubServer(configPath, app);
+});
+
+describe('files', () => {
+  test('file without HTTP status', async () => {
+    const res = await request(app).get('/get/json/noHttpStatus');
+    expect(res.status).toEqual(500);
+    expect(res.serverError).toEqual(true);
+    expect(res.text).toMatch(/<title>Error<\/title>/);
+    expect(res.text).toMatch(
+      /<pre>Error: Could not retrieve HTTP status code from: .*\/config-test\/get_json_noHttpStatus.json.*<\/pre>/
+    );
+  });
+
+  test('json', async () => {
+    const res = await request(app).get('/get/json');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'get_json_200_OK.json' });
+  });
+
+  test('png', async () => {
+    const res = await request(app).get('/get/png');
+    expect(res.status).toEqual(200);
+
+    // Image taken from https://github.com/aureooms/pixels/tree/2c1e39152339aa8323304d037aeeed1f9e6e24ab
+
+    expect(res.body).toEqual(expect.any(Buffer));
+  });
+
+  test('ts', async () => {
+    const res = await request(app).get('/get/ts');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'get_ts_200_OK.ts' });
+  });
+
+  test('js', async () => {
+    const res = await request(app).get('/get/js');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'get_js_200_OK.js' });
+  });
+
+  test('html', async () => {
+    const res = await request(app).get('/get/html');
+    expect(res.status).toEqual(200);
+    const html = (res.body as Buffer).toString();
+    expect(html).toEqual('<!DOCTYPE html>\n<title>get_html_200_OK.html</title>\n');
+  });
+});
+
+describe('HTTP status codes', () => {
+  test('400 Bad Request', async () => {
+    const res = await request(app).get('/get/400_BadRequest');
+    expect(res.status).toEqual(400);
+    expect(res.body).toEqual({ stub: 'get_json_400_BadRequest.json' });
+  });
+
+  test('500 Internal Server Error', async () => {
+    const res = await request(app).get('/get/500_InternalServerError');
+    expect(res.status).toEqual(500);
+    expect(res.body).toEqual({ stub: 'get_json_500_InternalServerError.json' });
+  });
+
+  test('204 No Content', async () => {
+    const res = await request(app).get('/get/204_NoContent');
+    expect(res.status).toEqual(204);
+    expect(res.body).toEqual({});
+  });
+});
+
+describe('HTTP verbs', () => {
+  test('GET', async () => {
+    const res = await request(app).get('/get/json');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'get_json_200_OK.json' });
+  });
+
+  test('POST', async () => {
+    const res = await request(app).post('/post/json');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'post_json_200_OK.json' });
+  });
+
+  test('PUT', async () => {
+    const res = await request(app).put('/put/json');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'put_json_200_OK.json' });
+  });
+
+  test('PATCH', async () => {
+    const res = await request(app).patch('/patch/json');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'patch_json_200_OK.json' });
+  });
+
+  test('DELETE', async () => {
+    const res = await request(app).delete('/delete/json');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'delete_json_200_OK.json' });
+  });
+
+  test('multiple verbs', async () => {
+    let res = await request(app).get('/multiple/verbs');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'get_json_200_OK.json' });
+
+    res = await request(app).post('/multiple/verbs');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'post_json_200_OK.json' });
+
+    res = await request(app).put('/multiple/verbs');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'put_json_200_OK.json' });
+
+    res = await request(app).patch('/multiple/verbs');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'patch_json_200_OK.json' });
+
+    res = await request(app).delete('/multiple/verbs');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'delete_json_200_OK.json' });
+  });
+});
+
+test('URL redirection with param', async () => {
+  function handleProxy(_req: express.Request, res: express.Response, _next: express.NextFunction) {
+    res.status(200).send({
+      userId: 1,
+      id: 1,
+      title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
+      body:
+        'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+    });
+  }
+  (proxy as jest.Mock).mockImplementation(() => handleProxy);
+
+  const res = await request(app).get('/posts/1');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({
+    userId: 1,
+    id: 1,
+    title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
+    body:
+      'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+  });
+});
+
+test('POST multipart request', async () => {
+  function handleProxy(_req: express.Request, res: express.Response, _next: express.NextFunction) {
+    res.status(200).send({
+      args: {},
+      data: {},
+      files: {
+        '1x1#000000.png':
+          'data:application/octet-stream;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACXBIWXMAAAsTAAALEwEAmpwYAAAACklEQVQIHWNgAAAAAgABz8g15QAAAABJRU5ErkJggg=='
+      },
+      form: {},
+      headers: {
+        'accept-encoding': 'gzip, deflate',
+        'content-length': '300',
+        'content-type':
+          'multipart/form-data; boundary=--------------------------579117600727930638952591',
+        host: 'postman-echo.com',
+        'user-agent': 'node-superagent/3.8.3',
+        'x-forwarded-port': '443',
+        'x-forwarded-proto': 'https'
+      },
+      json: null,
+      url: 'https://postman-echo.com/post'
+    });
+  }
+  (proxy as jest.Mock).mockImplementation(() => handleProxy);
+
+  // Image taken from https://github.com/aureooms/pixels/tree/2c1e39152339aa8323304d037aeeed1f9e6e24ab
+
+  const res = await request(app)
+    .post('/post')
+    .attach('image', `${__dirname}/config-test/1x1#000000.png`);
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({
+    args: {},
+    data: {},
+    files: {
+      '1x1#000000.png':
+        'data:application/octet-stream;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACXBIWXMAAAsTAAALEwEAmpwYAAAACklEQVQIHWNgAAAAAgABz8g15QAAAABJRU5ErkJggg=='
+    },
+    form: {},
+    headers: {
+      'accept-encoding': 'gzip, deflate',
+      'content-length': '300',
+      'content-type': expect.any(String),
+      host: 'postman-echo.com',
+      'user-agent': 'node-superagent/3.8.3',
+      'x-forwarded-port': '443',
+      'x-forwarded-proto': 'https'
+    },
+    json: null,
+    url: 'https://postman-echo.com/post'
+  });
+});

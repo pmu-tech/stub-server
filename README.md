@@ -41,12 +41,12 @@ const config: StubServerConfig = {
   minDelay: 0,
   maxDelay: 5000,
   routes: {
-    'my/api1': { get: `${stubsPath}/my_api1_200_OK.json` },
-    'my/api2': { get: `${stubsPath}/my_api2_200_OK.jpg` },
-    'my/api3': { post: `${stubsPath}/my_api3_400_BadRequest_invalidField.ts` },
-    'my/api4': { post: `${stubsPath}/my_api4_400_BadRequest_invalidField.js` },
-    'my/api5': { delete: `${stubsPath}/my_api5_500_InternalServerError.html` },
-    'my/api6/:id': { put: prod }
+    '/my/api1': { get: `${stubsPath}/my_api1_200_OK.json` },
+    '/my/api2': { get: `${stubsPath}/my_api2_200_OK.jpg` },
+    '/my/api3': { post: `${stubsPath}/my_api3_400_BadRequest_invalidField.ts` },
+    '/my/api4': { post: `${stubsPath}/my_api4_400_BadRequest_invalidField.js` },
+    '/my/api5': { delete: `${stubsPath}/my_api5_500_InternalServerError.html` },
+    '/my/api6/:id': { put: prod }
   }
 };
 
