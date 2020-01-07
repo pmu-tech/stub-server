@@ -1,5 +1,4 @@
 import express from 'express';
-import assert from 'assert';
 import fs from 'fs';
 import proxy from 'express-http-proxy';
 
@@ -51,7 +50,12 @@ const sendToProxy = (target: string, req: express.Request, res: express.Response
     proxy(target, { parseReqBody: !isMultipartRequest(req) })(req, res, resolve)
   );
 
-async function processStubRequest(apiPath: string, req: express.Request, res: express.Response) {
+async function processStubRequest(
+  apiPath: string,
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
   // Re-read the config file for each new request so the user
   // don't have to restart the stub server
   // except if he adds a new route which is acceptable
@@ -68,29 +72,33 @@ async function processStubRequest(apiPath: string, req: express.Request, res: ex
     await sendToProxy(url, req, res);
   } else {
     const match = /_(\d+)_[a-zA-Z]+/.exec(response);
-    assert(match !== null, `Could not retrieve HTTP status code from: '${response}'`);
-    const httpStatus = Number(match![1]);
 
-    let fileContent: string | object = '';
-
-    /* eslint-disable no-lonely-if */
-    if (httpStatus === 204 /* No Content */) {
-      // Nothing to return
+    if (match === null) {
+      next(new Error(`Could not retrieve HTTP status code from: '${response}'`));
     } else {
-      const filename = response;
+      const httpStatus = Number(match![1]);
 
-      if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
-        // Can load .json, .js or .ts files
-        deleteRequireCache(filename);
-        fileContent = (await import(filename)).default;
+      let fileContent: string | object = '';
+
+      /* eslint-disable no-lonely-if */
+      if (httpStatus === 204 /* No Content */) {
+        // Nothing to return
       } else {
-        // Anything else: .html, .jpg...
-        fileContent = fs.readFileSync(filename);
-      }
-    }
-    /* eslint-enable no-lonely-if */
+        const filename = response;
 
-    res.status(httpStatus).send(fileContent);
+        if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
+          // Can load .json, .js or .ts files
+          deleteRequireCache(filename);
+          fileContent = (await import(filename)).default;
+        } else {
+          // Anything else: .html, .jpg...
+          fileContent = fs.readFileSync(filename);
+        }
+      }
+      /* eslint-enable no-lonely-if */
+
+      res.status(httpStatus).send(fileContent);
+    }
   }
 }
 
@@ -104,7 +112,9 @@ export function stubServer(configPath: string, app: express.Application) {
 
   Object.entries(routes).forEach(([apiPath, route]) => {
     Object.entries(route).forEach(([method]) => {
-      app[method as Method](apiPath, (req, res) => processStubRequest(apiPath, req, res));
+      app[method as Method](apiPath, (req, res, next) =>
+        processStubRequest(apiPath, req, res, next)
+      );
     });
   });
 }
