@@ -5,6 +5,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "esModuleInterop": true,
+    "isolatedModules": true,
 
     "strict": true,
     "noUnusedLocals": true,
