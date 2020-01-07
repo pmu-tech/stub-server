@@ -45,9 +45,9 @@ function isMultipartRequest(req: express.Request) {
   return contentTypeHeader && contentTypeHeader.indexOf('multipart') > -1;
 }
 
-const sendToProxy = (target: string, req: express.Request, res: express.Response) =>
+const sendToProxy = (host: string, req: express.Request, res: express.Response) =>
   new Promise<void>(resolve =>
-    proxy(target, { parseReqBody: !isMultipartRequest(req) })(req, res, resolve)
+    proxy(host, { parseReqBody: !isMultipartRequest(req) })(req, res, resolve)
   );
 
 async function processStubRequest(
