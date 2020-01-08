@@ -8,6 +8,9 @@ const config: StubServerConfig = {
   routes: {
     '/get/json/noHttpStatus': { get: `${stubsPath}/get_json_noHttpStatus.json` },
 
+    '/get/json/noFile': { get: `${stubsPath}/get_json_200_OK_noFile.json` },
+    '/get/png/noFile': { get: `${stubsPath}/get_json_200_OK_noFile.png` },
+
     '/get/json': { get: `${stubsPath}/get_json_200_OK.json` },
 
     '/get/png': { get: `${stubsPath}/get_png_200_OK.png` },
@@ -15,6 +18,7 @@ const config: StubServerConfig = {
     '/get/js': { get: `${stubsPath}/get_js_200_OK.js` },
     '/get/html': { get: `${stubsPath}/get_html_200_OK.html` },
 
+    '/get/666_invalidHttpStatus': { get: `${stubsPath}/get_json_666_invalidHttpStatus.json` },
     '/get/400_BadRequest': { get: `${stubsPath}/get_json_400_BadRequest.json` },
     '/get/500_InternalServerError': { get: `${stubsPath}/get_json_500_InternalServerError.json` },
     '/get/204_NoContent': { get: `${stubsPath}/get_json_204_NoContent.json` },
@@ -25,6 +29,7 @@ const config: StubServerConfig = {
     '/delete/json': { delete: `${stubsPath}/delete_json_200_OK.json` },
 
     '/posts/:id': { get: 'https://jsonplaceholder.typicode.com' },
+    '/unknownHost': { get: 'http://unknown_host.com/' },
 
     '/multiple/verbs': {
       get: `${stubsPath}/get_json_200_OK.json`,

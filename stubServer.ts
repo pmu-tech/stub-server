@@ -45,10 +45,14 @@ function isMultipartRequest(req: express.Request) {
   return contentTypeHeader && contentTypeHeader.indexOf('multipart') > -1;
 }
 
-const sendToProxy = (host: string, req: express.Request, res: express.Response) =>
-  new Promise<void>(resolve =>
-    proxy(host, { parseReqBody: !isMultipartRequest(req) })(req, res, resolve)
-  );
+function sendToProxy(
+  host: string,
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
+  proxy(host, { parseReqBody: !isMultipartRequest(req) })(req, res, next);
+}
 
 async function processStubRequest(
   apiPath: string,
@@ -69,7 +73,7 @@ async function processStubRequest(
 
   if (isUrl(response)) {
     const url = `${response}${req.url}`;
-    await sendToProxy(url, req, res);
+    sendToProxy(url, req, res, next);
   } else {
     const match = /_(\d+)_[a-zA-Z]+/.exec(response);
 
@@ -88,10 +92,12 @@ async function processStubRequest(
 
         if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
           // Can load .json, .js or .ts files
+          // If file does not exist: "Cannot find module '...'"
           deleteRequireCache(filename);
           fileContent = (await import(filename)).default;
         } else {
           // Anything else: .html, .jpg...
+          // If file does not exist: "ENOENT: no such file or directory, open '...'"
           fileContent = fs.readFileSync(filename);
         }
       }
@@ -112,6 +118,7 @@ export function stubServer(configPath: string, app: express.Application) {
 
   Object.entries(routes).forEach(([apiPath, route]) => {
     Object.entries(route).forEach(([method]) => {
+      // If invalid method, crash with "TypeError: app[method] is not a function"
       app[method as Method](apiPath, (req, res, next) =>
         processStubRequest(apiPath, req, res, next)
       );
