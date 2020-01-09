@@ -75,10 +75,12 @@ async function processStubRequest(
     const url = `${response}${req.url}`;
     sendToProxy(url, req, res, next);
   } else {
-    const match = /_(\d+)_[a-zA-Z]+/.exec(response);
+    const filename = response;
+
+    const match = /_(\d+)_[a-zA-Z]+/.exec(filename);
 
     if (match === null) {
-      next(new Error(`Could not retrieve HTTP status code from: '${response}'`));
+      next(new Error(`Could not retrieve HTTP status code from: '${filename}'`));
     } else {
       const httpStatus = Number(match![1]);
 
@@ -88,8 +90,6 @@ async function processStubRequest(
       if (httpStatus === 204 /* No Content */) {
         // Nothing to return
       } else {
-        const filename = response;
-
         if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
           // Can load .json, .js or .ts files
           // If file does not exist: "Cannot find module '...'"
