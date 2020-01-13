@@ -35,7 +35,7 @@
     "lint": "npm run tsc && eslint . '**/*.{js,ts}'",
     "precommit": "npm run format && npm run lint",
     "prepush": "npm run precommit && npm run build && npm run test",
-    "npm:update": "ncu --upgrade"
+    "npm:update": "npm run clean:all && npx npm-check-updates --upgrade && npm install"
   },
   "peerDependencies": {
     "express": "^4.17.1"
@@ -62,7 +62,6 @@
     "express": "^4.17.1",
     "husky": "^4.0.1",
     "jest": "^24.9.0",
-    "npm-check-updates": "^4.0.1",
     "prettier": "^1.19.1",
     "supertest": "^4.0.2",
     "typescript": "^3.7.4"
