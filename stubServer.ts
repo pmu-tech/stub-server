@@ -32,7 +32,8 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const randomDelay = (min: number, max: number) =>
   // We could do better by allowing different number distributions
   // See [Generate random number with a non-uniform distribution](https://stackoverflow.com/q/16110758)
-  sleep(Math.floor(Math.random() * max) + min);
+  // See [Generate random number between two numbers in JavaScript](https://stackoverflow.com/a/7228322/990356)
+  sleep(Math.floor(Math.random() * (max - min + 1)) + min);
 
 const isUrl = (str: string) => str.startsWith('http');
 
