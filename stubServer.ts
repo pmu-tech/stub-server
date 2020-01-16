@@ -60,12 +60,7 @@ function sendToProxy(
   proxy(host, { parseReqBody: !isMultipartRequest(req) })(req, res, next);
 }
 
-async function processStubRequest(
-  apiPath: string,
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) {
+async function parseConfig(apiPath: string, req: express.Request) {
   // Re-read the config file for each new request so the user
   // don't have to restart the stub server
   // except if he adds a new route which is acceptable
@@ -94,6 +89,17 @@ async function processStubRequest(
   await randomDelay(min, max);
 
   console.log(`${httpVerb} ${req.url} => ${response}, delay: ${min}..${max} ms`);
+
+  return response;
+}
+
+async function processStubRequest(
+  apiPath: string,
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
+  const response = await parseConfig(apiPath, req);
 
   if (isUrl(response)) {
     const url = `${response}${req.url}`;
