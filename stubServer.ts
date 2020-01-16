@@ -110,22 +110,22 @@ async function processStubRequest(
 
       let fileContent: string | object = '';
 
-      /* eslint-disable no-lonely-if */
       if (httpStatus === 204 /* No Content */) {
         // Nothing to return
+      } else if (
+        filename.endsWith('.json') ||
+        filename.endsWith('.js') ||
+        filename.endsWith('.ts')
+      ) {
+        // Can load .json, .js or .ts files
+        // If file does not exist: "Cannot find module '...'"
+        deleteRequireCache(filename);
+        fileContent = (await import(filename)).default;
       } else {
-        if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
-          // Can load .json, .js or .ts files
-          // If file does not exist: "Cannot find module '...'"
-          deleteRequireCache(filename);
-          fileContent = (await import(filename)).default;
-        } else {
-          // Anything else: .html, .jpg...
-          // If file does not exist: "ENOENT: no such file or directory, open '...'"
-          fileContent = fs.readFileSync(filename);
-        }
+        // Anything else: .html, .jpg...
+        // If file does not exist: "ENOENT: no such file or directory, open '...'"
+        fileContent = fs.readFileSync(filename);
       }
-      /* eslint-enable no-lonely-if */
 
       res.status(httpStatus).send(fileContent);
     }
