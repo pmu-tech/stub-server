@@ -2,18 +2,23 @@ import express from 'express';
 import fs from 'fs';
 import proxy from 'express-http-proxy';
 
-type Method = 'get' | 'post' | 'put' | 'patch' | 'delete';
+type HTTPVerb = 'get' | 'post' | 'put' | 'patch' | 'delete';
 type URL = string;
 type StubFilename = string;
 
-type Route = {
-  [method in Method]?: URL | StubFilename;
+type Delay = { min: number; max: number };
+
+type Response = {
+  [httpVerb in HTTPVerb]?: URL | StubFilename | { response: URL | StubFilename; delay?: Delay };
 };
 
+type Route = { delay?: Delay } & Response;
+
 export interface StubServerConfig {
-  minDelay: number;
-  maxDelay: number;
-  routes: { [apiPath: string]: Route };
+  delay?: Delay;
+  routes: {
+    [apiPath: string]: Route;
+  };
 }
 
 // Allows to modify the imported files without restarting the server
@@ -63,13 +68,31 @@ async function processStubRequest(
   // Re-read the config file for each new request so the user
   // don't have to restart the stub server
   // except if he adds a new route which is acceptable
-  const { minDelay, maxDelay, routes } = getConfig();
-  const response = routes[apiPath][req.method.toLowerCase() as Method]!;
+  const { delay: globalDelay, routes } = getConfig();
 
-  console.log(`${req.method} ${req.url} => ${response}`);
+  const route = routes[apiPath];
 
-  // Explicitly set a timer for all requests (stub and remote) to simulate users network
-  await randomDelay(minDelay, maxDelay);
+  const { delay: routeDelay, ...responses } = route;
+
+  const httpVerb = req.method.toLowerCase() as HTTPVerb;
+  const findResponse = responses[httpVerb]!;
+
+  let response: URL | StubFilename;
+  let delay: Delay | undefined;
+
+  if (typeof findResponse === 'string') {
+    response = findResponse;
+  } else {
+    response = findResponse.response;
+    delay = findResponse.delay;
+  }
+
+  // Delay the request to simulate network latency
+  // istanbul ignore next
+  const { min, max } = delay ?? routeDelay ?? globalDelay ?? { min: 0, max: 0 };
+  await randomDelay(min, max);
+
+  console.log(`${httpVerb} ${req.url} => ${response}, delay: ${min}..${max} ms`);
 
   if (isUrl(response)) {
     const url = `${response}${req.url}`;
@@ -117,11 +140,13 @@ export function stubServer(configPath: string, app: express.Application) {
   const { routes } = getConfig();
 
   Object.entries(routes).forEach(([apiPath, route]) => {
-    Object.entries(route).forEach(([method]) => {
-      // If invalid method, crash with "TypeError: app[method] is not a function"
-      app[method as Method](apiPath, (req, res, next) =>
-        processStubRequest(apiPath, req, res, next)
-      );
+    Object.keys(route).forEach(httpVerb => {
+      if (httpVerb !== 'delay') {
+        // If invalid HTTP verb, crash with "TypeError: app[httpVerb] is not a function"
+        app[httpVerb as HTTPVerb](apiPath, (req, res, next) =>
+          processStubRequest(apiPath, req, res, next)
+        );
+      }
     });
   });
 }
