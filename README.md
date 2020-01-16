@@ -38,22 +38,29 @@ const prod = 'https://pmu.fr';
 const stubsPath = path.resolve(__dirname, 'routes');
 
 const config: StubServerConfig = {
-  minDelay: 0,
-  maxDelay: 5000,
+  delay: { min: 500, max: 3000 },
   routes: {
-    '/my/api1': { get: `${stubsPath}/my_api1_200_OK.json` },
-    '/my/api2': { get: `${stubsPath}/my_api2_200_OK.jpg` },
-    '/my/api3': { post: `${stubsPath}/my_api3_400_BadRequest_invalidField.ts` },
-    '/my/api4': { post: `${stubsPath}/my_api4_400_BadRequest_invalidField.js` },
-    '/my/api5': { delete: `${stubsPath}/my_api5_500_InternalServerError.html` },
-    '/my/api6/:id': { put: prod }
+    '/my/api1': { get: `${stubsPath}/get_my_api1_200_OK.json` },
+    '/my/api2': { get: `${stubsPath}/get_my_api2_200_OK.jpg` },
+    '/my/api3': { post: `${stubsPath}/post_my_api3_400_BadRequest-invalidField.ts` },
+    '/my/api4': { post: `${stubsPath}/post_my_api4_400_BadRequest-invalidField.js` },
+    '/my/api5': { delete: `${stubsPath}/delete_my_api5_500_InternalServerError.html` },
+    '/my/api6/:id': { put: prod },
+    '/my/api7': {
+      delay: { min: 1000, max: 1000 },
+      get: `${stubsPath}/get_my_api7_200_OK.json`,
+      post: {
+        delay: { min: 0, max: 0 },
+        response: `${stubsPath}/post_my_api7_200_OK.json`
+      }
+    }
   }
 };
 
 const rootApiPath = 'https://pmu.fr/client/:clientApi';
 config.routes[`${rootApiPath}/my/api7`] = { get: `${stubsPath}/my_api7_200_OK.json` };
 
-export default config;
+export default config; // Or "exports.default = config"
 ```
 
 ### webpack.config.ts
@@ -79,7 +86,7 @@ import { stubServer } from '@pmu-tech/stub-server';
 // ...
 ```
 
-### stubs/routes/my_api3_400_BadRequest_invalidField.ts
+### stubs/routes/post_my_api3_400_BadRequest-invalidField.ts
 
 ```TypeScript
 export default {
@@ -87,7 +94,7 @@ export default {
 };
 ```
 
-### stubs/routes/my_api4_400_BadRequest_invalidField.js
+### stubs/routes/post_my_api4_400_BadRequest-invalidField.js
 
 ```JavaScript
 module.exports = {

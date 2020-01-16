@@ -23,24 +23,24 @@ describe('files', () => {
     expect(res.serverError).toEqual(true);
     expect(res.text).toMatch(/<title>Error<\/title>/);
     expect(res.text).toMatch(
-      /<pre>Error: Could not retrieve HTTP status code from: .*\/config-test\/get_json_noHttpStatus.json.*<\/pre>/
+      /<pre>Error: Could not retrieve HTTP status code from: .*\/config-test\/get_noHttpStatus.json.*<\/pre>/
     );
   });
 
   test('json file does not exist', async () => {
-    // Crash with "Cannot find module 'stub-server/config-test/get_json_200_OK_noFile.json' from 'stubServer.ts'"
+    // Crash with "Cannot find module 'stub-server/config-test/get_200_OK_noFile.json' from 'stubServer.ts'"
     // await request(app).get('/get/json/noFile');
   });
 
   test('png file does not exist', async () => {
-    // Crash with "ENOENT: no such file or directory, open 'stub-server/config-test/get_json_200_OK_noFile.png'"
+    // Crash with "ENOENT: no such file or directory, open 'stub-server/config-test/get_200_OK_noFile.png'"
     // await request(app).get('/get/png/noFile');
   });
 
   test('json', async () => {
     const res = await request(app).get('/get/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'get_json_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'get_200_OK.json' });
   });
 
   test('png', async () => {
@@ -76,19 +76,19 @@ describe('HTTP status codes', () => {
   test('invalid HTTP status code', async () => {
     const res = await request(app).get('/get/666_invalidHttpStatus');
     expect(res.status).toEqual(666);
-    expect(res.body).toEqual({ stub: 'get_json_666_invalidHttpStatus.json' });
+    expect(res.body).toEqual({ stub: 'get_666_invalidHttpStatus.json' });
   });
 
   test('400 Bad Request', async () => {
     const res = await request(app).get('/get/400_BadRequest');
     expect(res.status).toEqual(400);
-    expect(res.body).toEqual({ stub: 'get_json_400_BadRequest.json' });
+    expect(res.body).toEqual({ stub: 'get_400_BadRequest.json' });
   });
 
   test('500 Internal Server Error', async () => {
     const res = await request(app).get('/get/500_InternalServerError');
     expect(res.status).toEqual(500);
-    expect(res.body).toEqual({ stub: 'get_json_500_InternalServerError.json' });
+    expect(res.body).toEqual({ stub: 'get_500_InternalServerError.json' });
   });
 
   test('204 No Content', async () => {
@@ -107,53 +107,53 @@ describe('HTTP verbs', () => {
   test('GET', async () => {
     const res = await request(app).get('/get/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'get_json_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'get_200_OK.json' });
   });
 
   test('POST', async () => {
     const res = await request(app).post('/post/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'post_json_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'post_200_OK.json' });
   });
 
   test('PUT', async () => {
     const res = await request(app).put('/put/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'put_json_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'put_200_OK.json' });
   });
 
   test('PATCH', async () => {
     const res = await request(app).patch('/patch/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'patch_json_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'patch_200_OK.json' });
   });
 
   test('DELETE', async () => {
     const res = await request(app).delete('/delete/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'delete_json_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'delete_200_OK.json' });
   });
 
   test('multiple verbs', async () => {
     let res = await request(app).get('/multiple/verbs');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'get_json_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'get_200_OK.json' });
 
     res = await request(app).post('/multiple/verbs');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'post_json_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'post_200_OK.json' });
 
     res = await request(app).put('/multiple/verbs');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'put_json_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'put_200_OK.json' });
 
     res = await request(app).patch('/multiple/verbs');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'patch_json_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'patch_200_OK.json' });
 
     res = await request(app).delete('/multiple/verbs');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'delete_json_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'delete_200_OK.json' });
   });
 });
 
@@ -266,6 +266,42 @@ describe('proxy', () => {
       url: 'https://postman-echo.com/post'
     });
   });
+});
+
+test('delay', async () => {
+  const consoleSpy = jest.spyOn(console, 'log');
+
+  let res = await request(app).get('/multiple/verbs/delay');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({ stub: 'get_200_OK.json' });
+  expect(consoleSpy).toHaveBeenCalledTimes(1);
+  expect(consoleSpy).toHaveBeenLastCalledWith(
+    expect.stringMatching(
+      /^get \/multiple\/verbs\/delay => \/.*\/config-test\/get_200_OK\.json, delay: 2\.\.3 ms$/
+    )
+  );
+
+  res = await request(app).post('/multiple/verbs/delay');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({ stub: 'post_200_OK.json' });
+  expect(consoleSpy).toHaveBeenCalledTimes(2);
+  expect(consoleSpy).toHaveBeenLastCalledWith(
+    expect.stringMatching(
+      /^post \/multiple\/verbs\/delay => \/.*\/stub-server\/config-test\/post_200_OK\.json, delay: 4\.\.5 ms$/
+    )
+  );
+
+  res = await request(app).put('/multiple/verbs/delay');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({ stub: 'put_200_OK.json' });
+  expect(consoleSpy).toHaveBeenCalledTimes(3);
+  expect(consoleSpy).toHaveBeenLastCalledWith(
+    expect.stringMatching(
+      /^put \/multiple\/verbs\/delay => \/.*\/stub-server\/config-test\/put_200_OK\.json, delay: 4\.\.6 ms$/
+    )
+  );
+
+  consoleSpy.mockRestore();
 });
 
 test('unknown route', async () => {
