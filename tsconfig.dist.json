@@ -2,5 +2,6 @@
   "extends": "./tsconfig",
   "compilerOptions": {
     "noEmit": false
-  }
+  },
+  "files": ["stubServer.ts"]
 }
