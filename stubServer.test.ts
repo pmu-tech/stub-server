@@ -19,12 +19,8 @@ beforeAll(() => {
 describe('files', () => {
   test('file without HTTP status', async () => {
     const res = await request(app).get('/get/json/noHttpStatus');
-    expect(res.status).toEqual(500);
-    expect(res.serverError).toEqual(true);
-    expect(res.text).toMatch(/<title>Error<\/title>/);
-    expect(res.text).toMatch(
-      /<pre>Error: Could not retrieve HTTP status code from: .*\/config-test\/get_noHttpStatus.json.*<\/pre>/
-    );
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'get_noHttpStatus.json' });
   });
 
   test('json file does not exist', async () => {

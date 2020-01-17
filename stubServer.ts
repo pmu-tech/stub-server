@@ -132,17 +132,13 @@ async function processStubRequest(
 
     if (fileContent !== undefined) {
       const match = /_(\d+)_[a-zA-Z]+/.exec(filename);
+      const httpStatus =
+          match !== null ? Number(match![1]) : 200 /* Default HTTP status if none specified */;
 
-      if (match === null) {
-        next(new Error(`Could not retrieve HTTP status code from: '${filename}'`));
+      if (httpStatus === 204 /* No Content */) {
+        res.status(httpStatus).end();
       } else {
-        const httpStatus = Number(match![1]);
-
-        if (httpStatus === 204 /* No Content */) {
-          res.status(httpStatus).end();
-        } else {
-          res.status(httpStatus).send(fileContent);
-        }
+        res.status(httpStatus).send(fileContent);
       }
     }
   }
