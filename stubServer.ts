@@ -107,33 +107,43 @@ async function processStubRequest(
   } else {
     const filename = response;
 
-    const match = /_(\d+)_[a-zA-Z]+/.exec(filename);
+    let fileContent: string | object | undefined;
 
-    if (match === null) {
-      next(new Error(`Could not retrieve HTTP status code from: '${filename}'`));
-    } else {
-      const httpStatus = Number(match![1]);
+    if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
+      // Can load .json, .js or .ts files
+      // If file does not exist: "Cannot find module '...'"
+      deleteRequireCache(filename);
+      const jsFileContent = (await import(filename)).default;
 
-      let fileContent: string | object = '';
-
-      if (httpStatus === 204 /* No Content */) {
-        // Nothing to return
-      } else if (
-        filename.endsWith('.json') ||
-        filename.endsWith('.js') ||
-        filename.endsWith('.ts')
+      if (
+        (filename.endsWith('.js') || filename.endsWith('.ts')) &&
+        typeof jsFileContent === 'function'
       ) {
-        // Can load .json, .js or .ts files
-        // If file does not exist: "Cannot find module '...'"
-        deleteRequireCache(filename);
-        fileContent = (await import(filename)).default;
+        // Assume the function is an Express request handler
+        jsFileContent(req, res);
       } else {
-        // Anything else: .html, .jpg...
-        // If file does not exist: "ENOENT: no such file or directory, open '...'"
-        fileContent = fs.readFileSync(filename);
+        fileContent = jsFileContent;
       }
+    } else {
+      // Anything else: .html, .jpg...
+      // If file does not exist: "ENOENT: no such file or directory, open '...'"
+      fileContent = fs.readFileSync(filename);
+    }
 
-      res.status(httpStatus).send(fileContent);
+    if (fileContent !== undefined) {
+      const match = /_(\d+)_[a-zA-Z]+/.exec(filename);
+
+      if (match === null) {
+        next(new Error(`Could not retrieve HTTP status code from: '${filename}'`));
+      } else {
+        const httpStatus = Number(match![1]);
+
+        if (httpStatus === 204 /* No Content */) {
+          res.status(httpStatus).end();
+        } else {
+          res.status(httpStatus).send(fileContent);
+        }
+      }
     }
   }
 }

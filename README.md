@@ -8,7 +8,7 @@ For each route, decide what will happen: a json stub, a piece of JS or use a rea
 - Support stubs written in JSON, JS, TypeScript, HTML, jpg...
 - Can redirect requests to another host thx to [express-http-proxy](https://github.com/villadora/express-http-proxy)
 - No need to restart the stub server if you have modified a stub
-- The HTTP status code returned is determined from the stub filename: \*200_OK\*.json, \*500_InternalServerError\*.html...
+- The HTTP status code returned is determined from the stub filename: \*\_200\_\*.json, \*\_500\_\*.html...
 - Configurable delays to simulate slow APIs
 
 ## Usage
@@ -53,7 +53,9 @@ const config: StubServerConfig = {
         delay: { min: 0, max: 0 },
         response: `${stubsPath}/post_my_api7_200_OK.json`
       }
-    }
+    },
+    '/my/api7': { get: `${stubsPath}/my_api7.ts`},
+    '/my/api8': { get: `${stubsPath}/my_api8.ts`}
   }
 };
 
@@ -99,6 +101,24 @@ export default {
 ```JavaScript
 module.exports = {
   errorMessage: 'Invalid field'
+};
+```
+
+### stubs/routes/my_api7.ts
+
+```TypeScript
+import express from 'express';
+
+export default function stub(req: express.Request, res: express.Response) {
+  res.send('Hello, World!');
+}
+```
+
+### stubs/routes/my_api8.js
+
+```JavaScript
+module.exports = (req, res) => {
+  res.send('Hello, World!');
 };
 ```
 
