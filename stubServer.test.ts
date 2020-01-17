@@ -95,6 +95,7 @@ describe('HTTP status codes', () => {
     const res = await request(app).get('/get/204_NoContent');
     expect(res.status).toEqual(204);
     expect(res.body).toEqual({});
+    expect(res.text).toEqual('');
   });
 });
 
@@ -307,6 +308,53 @@ test('delay', async () => {
 test('unknown route', async () => {
   const res = await request(app).get('/get/unknownRoute');
   expect(res.status).toEqual(404);
+  expect(res.body).toEqual({});
   expect(res.text).toMatch(/<title>Error<\/title>/);
   expect(res.text).toMatch(/<pre>Cannot GET \/get\/unknownRoute<\/pre>/);
+});
+
+describe('express request handler', () => {
+  describe('ts', () => {
+    test('res.send()', async () => {
+      const res = await request(app).get('/get/express/ts/send');
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual({ param: 'send' });
+    });
+
+    test('res.send() async', async () => {
+      const res = await request(app).get('/get/express/ts/sendAsync');
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual({ param: 'sendAsync' });
+    });
+
+    test('res.status()', async () => {
+      // Timeout - Async callback was not invoked within the 5000ms timeout specified by jest.setTimeout.Timeout
+      // await request(app).get('/get/express/ts/status');
+    });
+
+    test('res.end()', async () => {
+      const res = await request(app).get('/get/express/ts/end');
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual({});
+      expect(res.text).toEqual('');
+    });
+
+    test('do nothing"', async () => {
+      // Timeout - Async callback was not invoked within the 5000ms timeout specified by jest.setTimeout.Timeout
+      // await request(app).get('/get/express/ts/doNothing');
+    });
+
+    test('without param', async () => {
+      const res = await request(app).get('/get/express/ts');
+      expect(res.status).toEqual(204);
+      expect(res.body).toEqual({});
+      expect(res.text).toEqual('');
+    });
+  });
+
+  test('js', async () => {
+    const res = await request(app).get('/get/express/js/param');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ param: 'param' });
+  });
 });

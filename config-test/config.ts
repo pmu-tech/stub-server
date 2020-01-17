@@ -52,7 +52,10 @@ const config: StubServerConfig = {
         response: `${stubsPath}/put_200_OK.json`,
         delay: { min: 4, max: 6 }
       }
-    }
+    },
+
+    '/get/express/ts/:param?': { get: `${stubsPath}/get_express.ts` },
+    '/get/express/js/:param?': { get: `${stubsPath}/get_express.js` }
   }
 };
 
