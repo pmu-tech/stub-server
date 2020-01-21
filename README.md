@@ -1,4 +1,4 @@
-# Stub server
+# @pmu-tech/stub-server
 
 ![](https://github.com/pmu-tech/stub-server/workflows/Node%20CI/badge.svg)
 
@@ -6,10 +6,10 @@ Stub server for REST APIs
 
 For each route, decide what will happen: a json stub, a piece of JS or use a real server
 
-- Use it with [webpack-dev-server](https://github.com/webpack/webpack-dev-server)
+- Use it with Express, [webpack-dev-server](https://github.com/webpack/webpack-dev-server) or the command line
 - Support stubs written in JSON, JS, TypeScript, HTML, jpg...
 - Can redirect requests to another host thx to [express-http-proxy](https://github.com/villadora/express-http-proxy)
-- No need to restart the stub server if you have modified a stub
+- No need to restart stub-server if you modify a stub
 - The HTTP status code returned is determined from the stub filename: \*\_200\_\*.json, \*\_500\_\*.html...
 - Configurable delays to simulate slow APIs
 
@@ -90,6 +90,12 @@ import { stubServer } from '@pmu-tech/stub-server';
 
 // ...
 ```
+
+### Command line
+
+`./node_modules/.bin/stub-server`
+
+Runs stub-server at http://127.0.0.1:12345 using `stubs/config`
 
 ### stubs/routes/post_my_api3_400_BadRequest-invalidField.ts
 

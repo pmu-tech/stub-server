@@ -21,6 +21,7 @@
   "files": [
     "dist/"
   ],
+  "bin": "bin/stub-server.js",
   "sideEffects": false,
   "scripts": {
     "clean": "rm -rf dist coverage",
