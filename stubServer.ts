@@ -3,13 +3,16 @@ import fs from 'fs';
 import proxy from 'express-http-proxy';
 
 type HTTPVerb = 'get' | 'post' | 'put' | 'patch' | 'delete';
+
 type URL = string;
 type StubFilename = string;
+type GetStubFilenameFunction = (req: express.Request) => URL | StubFilename;
+type Stub = URL | StubFilename | GetStubFilenameFunction;
 
 type Delay = { min: number; max: number };
 
 type Response = {
-  [httpVerb in HTTPVerb]?: URL | StubFilename | { response: URL | StubFilename; delay?: Delay };
+  [httpVerb in HTTPVerb]?: Stub | { response: Stub; delay?: Delay };
 };
 
 type Route = { delay?: Delay } & Response;
@@ -71,16 +74,18 @@ async function parseConfig(apiPath: string, req: express.Request) {
   const { delay: routeDelay, ...responses } = route;
 
   const httpVerb = req.method.toLowerCase() as HTTPVerb;
-  const findResponse = responses[httpVerb]!;
+  const stub = responses[httpVerb]!;
 
-  let response: URL | StubFilename;
+  let name: URL | StubFilename;
   let delay: Delay | undefined;
 
-  if (typeof findResponse === 'string') {
-    response = findResponse;
+  if (typeof stub === 'string') {
+    name = stub;
+  } else if (typeof stub === 'function') {
+    name = stub(req);
   } else {
-    response = findResponse.response;
-    delay = findResponse.delay;
+    name = typeof stub.response === 'function' ? stub.response(req) : stub.response;
+    delay = stub.delay;
   }
 
   // Delay the request to simulate network latency
@@ -88,9 +93,9 @@ async function parseConfig(apiPath: string, req: express.Request) {
   const { min, max } = delay ?? routeDelay ?? globalDelay ?? { min: 0, max: 0 };
   await randomDelay(min, max);
 
-  console.log(`${httpVerb} ${req.url} => ${response}, delay: ${min}..${max} ms`);
+  console.log(`${httpVerb} ${req.url} => ${name}, delay: ${min}..${max} ms`);
 
-  return response;
+  return name;
 }
 
 async function processStubRequest(
@@ -99,13 +104,13 @@ async function processStubRequest(
   res: express.Response,
   next: express.NextFunction
 ) {
-  const response = await parseConfig(apiPath, req);
+  const stubName = await parseConfig(apiPath, req);
 
-  if (isUrl(response)) {
-    const url = `${response}${req.url}`;
+  if (isUrl(stubName)) {
+    const url = `${stubName}${req.url}`;
     sendToProxy(url, req, res, next);
   } else {
-    const filename = response;
+    const filename = stubName;
 
     let fileContent: string | object | undefined;
 

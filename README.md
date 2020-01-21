@@ -55,7 +55,8 @@ const config: StubServerConfig = {
       }
     },
     '/my/api7': { get: `${stubsPath}/my_api7.ts`},
-    '/my/api8': { get: `${stubsPath}/my_api8.ts`}
+    '/my/api8': { get: `${stubsPath}/my_api8.ts`},
+    '/my/api9/:id': { get: req => `${stubsPath}/my_api9_200_OK-${req.params.id}.json` }
   }
 };
 
