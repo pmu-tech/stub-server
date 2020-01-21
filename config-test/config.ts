@@ -7,8 +7,8 @@ const config: StubServerConfig = {
   routes: {
     '/get/json/noHttpStatus': { get: `${stubsPath}/get_noHttpStatus.json` },
 
-    '/get/json/noFile': { get: `${stubsPath}/get_200_OK_noFile.json` },
-    '/get/png/noFile': { get: `${stubsPath}/get_200_OK_noFile.png` },
+    '/get/json/noFile': { get: `${stubsPath}/get_200_OK-noFile.json` },
+    '/get/png/noFile': { get: `${stubsPath}/get_200_OK-noFile.png` },
 
     '/get/json': { get: `${stubsPath}/get_200_OK.json` },
 
@@ -55,7 +55,12 @@ const config: StubServerConfig = {
     },
 
     '/get/express/ts/:param?': { get: `${stubsPath}/get_express.ts` },
-    '/get/express/js/:param?': { get: `${stubsPath}/get_express.js` }
+    '/get/express/js/:param?': { get: `${stubsPath}/get_express.js` },
+
+    '/function/:param': {
+      get: { response: req => `${stubsPath}/get_function_200_OK-${req.params.param}.json` },
+      post: req => `${stubsPath}/post_function_201_Created-${req.params.param}.json`
+    }
   }
 };
 

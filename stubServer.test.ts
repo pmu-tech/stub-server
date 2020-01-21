@@ -24,12 +24,12 @@ describe('files', () => {
   });
 
   test('json file does not exist', async () => {
-    // Crash with "Cannot find module 'stub-server/config-test/get_200_OK_noFile.json' from 'stubServer.ts'"
+    // Crash with "Cannot find module 'stub-server/config-test/get_200_OK-noFile.json' from 'stubServer.ts'"
     // await request(app).get('/get/json/noFile');
   });
 
   test('png file does not exist', async () => {
-    // Crash with "ENOENT: no such file or directory, open 'stub-server/config-test/get_200_OK_noFile.png'"
+    // Crash with "ENOENT: no such file or directory, open 'stub-server/config-test/get_200_OK-noFile.png'"
     // await request(app).get('/get/png/noFile');
   });
 
@@ -352,5 +352,19 @@ describe('express request handler', () => {
     const res = await request(app).get('/get/express/js/param');
     expect(res.status).toEqual(200);
     expect(res.body).toEqual({ param: 'param' });
+  });
+});
+
+describe('get stub name from function', () => {
+  test('no response property', async () => {
+    const res = await request(app).get('/function/param');
+    expect(res.status).toEqual(200);
+    expect(res.body).toEqual({ stub: 'get_function_200_OK-param.json' });
+  });
+
+  test('with response property', async () => {
+    const res = await request(app).post('/function/param');
+    expect(res.status).toEqual(201);
+    expect(res.body).toEqual({ stub: 'post_function_201_Created-param.json' });
   });
 });
