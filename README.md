@@ -1,5 +1,7 @@
 # Stub server
 
+![](https://github.com/pmu-tech/stub-server/workflows/Node%20CI/badge.svg)
+
 Stub server for REST APIs
 
 For each route, decide what will happen: a json stub, a piece of JS or use a real server
