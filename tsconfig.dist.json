@@ -1,7 +1,10 @@
 {
   "extends": "./tsconfig",
   "compilerOptions": {
-    "noEmit": false
+    "noEmit": false,
+
+    // Cannot use "esnext" because Node.js 12 does not support nullish coalescing operator (??)
+    "target": "es2020"
   },
   "files": ["stubServer.ts"]
 }
