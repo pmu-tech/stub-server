@@ -35,6 +35,7 @@
     "lint": "npm run tsc && eslint . '**/*.{js,ts}'",
     "precommit": "npm run format && npm run lint",
     "prepush": "npm run precommit && npm run build && npm run test:coverage",
+    "prepublishOnly": "npm run build",
     "npm:update": "npm run clean:all && npx npm-check-updates --upgrade && npm install"
   },
   "peerDependencies": {
