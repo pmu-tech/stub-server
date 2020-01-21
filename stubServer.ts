@@ -32,11 +32,14 @@ function deleteRequireCache(module: string) {
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-const randomDelay = (min: number, max: number) =>
+async function randomDelay(min: number, max: number) {
   // We could do better by allowing different number distributions
   // See [Generate random number with a non-uniform distribution](https://stackoverflow.com/q/16110758)
   // See [Generate random number between two numbers in JavaScript](https://stackoverflow.com/a/7228322/990356)
-  sleep(Math.floor(Math.random() * (max - min + 1)) + min);
+  const delay = Math.floor(Math.random() * (max - min + 1)) + min;
+  await sleep(delay);
+  return delay;
+}
 
 const isUrl = (str: string) => str.startsWith('http');
 
@@ -91,9 +94,9 @@ async function parseConfig(apiPath: string, req: express.Request) {
   // Delay the request to simulate network latency
   // istanbul ignore next
   const { min, max } = delay ?? routeDelay ?? globalDelay ?? { min: 0, max: 0 };
-  await randomDelay(min, max);
+  const actualDelay = await randomDelay(min, max);
 
-  console.log(`${httpVerb} ${req.url} => ${name}, delay: ${min}..${max} ms`);
+  console.log(`${httpVerb} ${req.url} => ${name}, delay: ${actualDelay} ms`);
 
   return name;
 }

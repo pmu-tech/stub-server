@@ -274,7 +274,7 @@ test('delay', async () => {
   expect(consoleSpy).toHaveBeenCalledTimes(1);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^get \/multiple\/verbs\/delay => \/.*\/config-test\/get_200_OK\.json, delay: 2\.\.3 ms$/
+      /^get \/multiple\/verbs\/delay => \/.*\/config-test\/get_200_OK\.json, delay: (2|3) ms$/
     )
   );
 
@@ -284,7 +284,7 @@ test('delay', async () => {
   expect(consoleSpy).toHaveBeenCalledTimes(2);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^post \/multiple\/verbs\/delay => \/.*\/stub-server\/config-test\/post_200_OK\.json, delay: 4\.\.5 ms$/
+      /^post \/multiple\/verbs\/delay => \/.*\/stub-server\/config-test\/post_200_OK\.json, delay: (4|5) ms$/
     )
   );
 
@@ -294,7 +294,7 @@ test('delay', async () => {
   expect(consoleSpy).toHaveBeenCalledTimes(3);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^put \/multiple\/verbs\/delay => \/.*\/stub-server\/config-test\/put_200_OK\.json, delay: 4\.\.6 ms$/
+      /^put \/multiple\/verbs\/delay => \/.*\/stub-server\/config-test\/put_200_OK\.json, delay: (4|6) ms$/
     )
   );
 
