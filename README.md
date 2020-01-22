@@ -36,12 +36,12 @@ webpack.config.ts
 ### stubs/config.ts
 
 ```TypeScript
-import path from 'path';
+import { resolve } from 'path';
 import { StubServerConfig } from '@pmu-tech/stub-server';
 
 const prod = 'https://pmu.fr';
 
-const stubsPath = path.resolve(__dirname, 'routes');
+const stubsPath = resolve(__dirname, 'routes');
 
 const config: StubServerConfig = {
   delay: { min: 500, max: 3000 },

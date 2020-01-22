@@ -1,4 +1,4 @@
-import path from 'path';
+import { resolve } from 'path';
 import request from 'supertest';
 import express from 'express';
 import proxy from 'express-http-proxy';
@@ -7,7 +7,7 @@ import { stubServer } from './stubServer';
 
 jest.mock('express-http-proxy');
 
-const configPath = path.resolve(__dirname, 'config-test', 'config');
+const configPath = resolve(__dirname, 'config-test', 'config');
 
 let app: express.Express;
 
