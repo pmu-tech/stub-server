@@ -23,6 +23,14 @@ const host = 'localhost';
 const port = 12345;
 
 const app = express();
+
+// CORS
+app.use((_req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  next();
+});
+
 const server = app.listen(port, host, () => {
   const address = /** @type {import('net').AddressInfo} */ (server.address());
   console.log(
