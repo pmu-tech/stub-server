@@ -22,12 +22,12 @@ describe('files', () => {
   });
 
   test('json file does not exist', async () => {
-    // Crash with "Cannot find module 'stub-server/config-test/get_200_OK-noFile.json' from 'stubServer.ts'"
+    // Crash with "Cannot find module 'config-test/get_200_OK-noFile.json' from 'stubServer.ts'"
     // await request(app).get('/get/json/noFile');
   });
 
   test('png file does not exist', async () => {
-    // Crash with "ENOENT: no such file or directory, open 'stub-server/config-test/get_200_OK-noFile.png'"
+    // Crash with "ENOENT: no such file or directory, open 'config-test/get_200_OK-noFile.png'"
     // await request(app).get('/get/png/noFile');
   });
 
@@ -305,7 +305,7 @@ test('delay', async () => {
   expect(consoleSpy).toHaveBeenCalledTimes(2);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^post \/multiple\/verbs\/delay => \/.*\/stub-server\/config-test\/post_200_OK\.json, delay: (4|5) ms$/
+      /^post \/multiple\/verbs\/delay => \/.*\/config-test\/post_200_OK\.json, delay: (4|5) ms$/
     )
   );
 
@@ -315,7 +315,7 @@ test('delay', async () => {
   expect(consoleSpy).toHaveBeenCalledTimes(3);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^put \/multiple\/verbs\/delay => \/.*\/stub-server\/config-test\/put_200_OK\.json, delay: (4|5|6) ms$/
+      /^put \/multiple\/verbs\/delay => \/.*\/config-test\/put_200_OK\.json, delay: (4|5|6) ms$/
     )
   );
 
