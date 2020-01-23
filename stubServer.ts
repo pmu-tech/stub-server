@@ -1,6 +1,6 @@
 import express from 'express';
 import fs from 'fs';
-import proxy from 'express-http-proxy';
+import { createProxyServer } from 'http-proxy';
 
 type HTTPVerb = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
@@ -51,20 +51,15 @@ function getConfig() {
   return require(_configPath).default as StubServerConfig;
 }
 
-// FIXME See [proxy multipart request](https://github.com/villadora/express-http-proxy/issues/127)
-function isMultipartRequest(req: express.Request) {
-  const contentTypeHeader = req.headers['content-type'];
-  return contentTypeHeader && contentTypeHeader.indexOf('multipart') > -1;
-}
+const proxy = createProxyServer({ changeOrigin: true });
 
-function sendToProxy(
-  host: string,
+// Exported for testing purposes only
+export const sendToProxy = (
+  target: string,
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
-) {
-  proxy(host, { parseReqBody: !isMultipartRequest(req) })(req, res, next);
-}
+) => proxy.web(req, res, { target }, next);
 
 async function parseConfig(apiPath: string, req: express.Request) {
   // Re-read the config file for each new request so the user
@@ -110,7 +105,7 @@ async function processStubRequest(
   const stubName = await parseConfig(apiPath, req);
 
   if (isUrl(stubName)) {
-    const url = `${stubName}${req.url}`;
+    const url = stubName;
     sendToProxy(url, req, res, next);
   } else {
     const filename = stubName;

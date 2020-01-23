@@ -12,7 +12,7 @@ For each route, decide what will happen: a json stub, a piece of JS or use a rea
 
 - Use it with Express, [webpack-dev-server](https://github.com/webpack/webpack-dev-server) or the command line
 - Support stubs written in JSON, JS, TypeScript, HTML, jpg...
-- Can redirect requests to another host thx to [express-http-proxy](https://github.com/villadora/express-http-proxy)
+- Can redirect requests to another host thx to [node-http-proxy](https://github.com/http-party/node-http-proxy)
 - No need to restart stub-server if you modify a stub
 - The HTTP status code returned is determined from the stub filename: \*\_200\_\*.json, \*\_500\_\*.html...
 - Configurable delays to simulate slow APIs
