@@ -1,6 +1,7 @@
 import express from 'express';
 import fs from 'fs';
-import { createProxyServer } from 'http-proxy';
+
+import { send } from './proxy';
 
 type HTTPVerb = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
@@ -51,16 +52,6 @@ function getConfig() {
   return require(_configPath).default as StubServerConfig;
 }
 
-const proxy = createProxyServer({ changeOrigin: true });
-
-// Exported for testing purposes only
-export const sendToProxy = (
-  target: string,
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) => proxy.web(req, res, { target }, next);
-
 async function parseConfig(apiPath: string, req: express.Request) {
   // Re-read the config file for each new request so the user
   // don't have to restart the stub server
@@ -106,7 +97,7 @@ async function processStubRequest(
 
   if (isUrl(stubName)) {
     const url = stubName;
-    sendToProxy(url, req, res, next);
+    send(url, req, res, next);
   } else {
     const filename = stubName;
 

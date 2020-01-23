@@ -2,7 +2,8 @@ import { resolve } from 'path';
 import request from 'supertest';
 import express from 'express';
 
-import * as stubServer from './stubServer';
+import * as proxy from './proxy';
+import { stubServer } from './stubServer';
 
 const configPath = resolve(__dirname, 'config-test', 'config');
 
@@ -10,7 +11,7 @@ let app: express.Express;
 
 beforeAll(() => {
   app = express();
-  stubServer.stubServer(configPath, app);
+  stubServer(configPath, app);
 });
 
 describe('files', () => {
@@ -154,7 +155,7 @@ describe('HTTP verbs', () => {
 describe('proxy', () => {
   test('URL redirection with param', async () => {
     const sendToProxyMock = jest
-      .spyOn(stubServer, 'sendToProxy')
+      .spyOn(proxy, 'send')
       .mockImplementationOnce(
         (
           _target: string,
@@ -188,7 +189,7 @@ describe('proxy', () => {
 
   test('URL redirection to unknown host', async () => {
     const sendToProxyMock = jest
-      .spyOn(stubServer, 'sendToProxy')
+      .spyOn(proxy, 'send')
       .mockImplementationOnce(
         (
           _target: string,
@@ -221,7 +222,7 @@ describe('proxy', () => {
 
   test('POST multipart request', async () => {
     const sendToProxyMock = jest
-      .spyOn(stubServer, 'sendToProxy')
+      .spyOn(proxy, 'send')
       .mockImplementationOnce(
         (
           _target: string,
