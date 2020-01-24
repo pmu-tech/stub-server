@@ -1,13 +1,11 @@
-import path from 'path';
+import { resolve } from 'path';
 import request from 'supertest';
 import express from 'express';
-import proxy from 'express-http-proxy';
 
+import * as proxy from './proxy';
 import { stubServer } from './stubServer';
 
-jest.mock('express-http-proxy');
-
-const configPath = path.resolve(__dirname, 'config-test', 'config');
+const configPath = resolve(__dirname, 'config-test', 'config');
 
 let app: express.Express;
 
@@ -24,12 +22,12 @@ describe('files', () => {
   });
 
   test('json file does not exist', async () => {
-    // Crash with "Cannot find module 'stub-server/config-test/get_200_OK-noFile.json' from 'stubServer.ts'"
+    // Crash with "Cannot find module 'config-test/get_200_OK-noFile.json' from 'stubServer.ts'"
     // await request(app).get('/get/json/noFile');
   });
 
   test('png file does not exist', async () => {
-    // Crash with "ENOENT: no such file or directory, open 'stub-server/config-test/get_200_OK-noFile.png'"
+    // Crash with "ENOENT: no such file or directory, open 'config-test/get_200_OK-noFile.png'"
     // await request(app).get('/get/png/noFile');
   });
 
@@ -155,112 +153,141 @@ describe('HTTP verbs', () => {
 });
 
 describe('proxy', () => {
-  test('URL redirection with param', async () => {
-    function handleProxy(
-      _req: express.Request,
-      res: express.Response,
-      _next: express.NextFunction
-    ) {
-      res.status(200).send({
-        userId: 1,
-        id: 1,
-        title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
-        body:
-          'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
-      });
-    }
-    (proxy as jest.Mock).mockImplementation(() => handleProxy);
+  const get_jsonplaceholder_typicode_com_posts_1 = {
+    userId: 1,
+    id: 1,
+    title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
+    body:
+      'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+  };
 
-    const res = await request(app).get('/posts/1');
-    expect(res.status).toEqual(200);
-    expect(res.body).toEqual({
-      userId: 1,
-      id: 1,
-      title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
-      body:
-        'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+  const post_postman_echo_com_post = {
+    args: {},
+    data: {},
+    files: {
+      '1x1#000000.png':
+        'data:application/octet-stream;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACXBIWXMAAAsTAAALEwEAmpwYAAAACklEQVQIHWNgAAAAAgABz8g15QAAAABJRU5ErkJggg=='
+    },
+    form: {},
+    headers: {
+      'accept-encoding': 'gzip, deflate',
+      'content-length': '300',
+      'content-type':
+        'multipart/form-data; boundary=--------------------------579117600727930638952591',
+      host: 'postman-echo.com',
+      'user-agent': 'node-superagent/3.8.3',
+      'x-forwarded-port': '443',
+      'x-forwarded-proto': 'https'
+    },
+    json: null,
+    url: 'https://postman-echo.com/post'
+  };
+
+  describe('mocked, no network request', () => {
+    test('URL redirection with param', async () => {
+      const sendToProxyMock = jest
+        .spyOn(proxy, 'send')
+        .mockImplementationOnce(
+          (
+            _target: string,
+            _req: express.Request,
+            res: express.Response,
+            _next: express.NextFunction
+          ) => res.status(200).send(get_jsonplaceholder_typicode_com_posts_1)
+        );
+
+      const res = await request(app).get('/posts/1');
+      expect(sendToProxyMock).toHaveBeenCalledTimes(1);
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(get_jsonplaceholder_typicode_com_posts_1);
+
+      sendToProxyMock.mockRestore();
+    });
+
+    test('URL redirection to unknown host', async () => {
+      const sendToProxyMock = jest
+        .spyOn(proxy, 'send')
+        .mockImplementationOnce(
+          (
+            _target: string,
+            _req: express.Request,
+            _res: express.Response,
+            next: express.NextFunction
+          ) => {
+            const error = new Error(
+              'getaddrinfo ENOTFOUND unknown_host.com unknown_host.com:80'
+            ) as any;
+            error.errno = 'ENOTFOUND';
+            error.code = 'ENOTFOUND';
+            error.syscall = 'getaddrinfo';
+            error.hostname = 'unknown_host.com';
+            error.host = 'unknown_host.com';
+            error.port = 80;
+            next(error);
+          }
+        );
+
+      const res = await request(app).get('/unknownHost');
+      expect(sendToProxyMock).toHaveBeenCalledTimes(1);
+      expect(res.status).toEqual(500);
+      expect(res.serverError).toEqual(true);
+      expect(res.text).toMatch(/<title>Error<\/title>/);
+      expect(res.text).toMatch(/<pre>Error: getaddrinfo ENOTFOUND unknown_host\.com.*<\/pre>/);
+
+      sendToProxyMock.mockRestore();
+    });
+
+    test('POST multipart request', async () => {
+      const sendToProxyMock = jest
+        .spyOn(proxy, 'send')
+        .mockImplementationOnce(
+          (
+            _target: string,
+            _req: express.Request,
+            res: express.Response,
+            _next: express.NextFunction
+          ) => res.status(200).send(post_postman_echo_com_post)
+        );
+
+      // Image taken from https://github.com/aureooms/pixels/tree/2c1e39152339aa8323304d037aeeed1f9e6e24ab
+
+      const res = await request(app)
+        .post('/post')
+        .attach('image', `${__dirname}/config-test/1x1#000000.png`);
+      expect(sendToProxyMock).toHaveBeenCalledTimes(1);
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(post_postman_echo_com_post);
+
+      sendToProxyMock.mockRestore();
     });
   });
 
-  test('URL redirection to unknown host', async () => {
-    function handleProxy(
-      _req: express.Request,
-      _res: express.Response,
-      next: express.NextFunction
-    ) {
-      const error = new Error('getaddrinfo ENOTFOUND unknown_host.com unknown_host.com:80') as any;
-      error.errno = 'ENOTFOUND';
-      error.code = 'ENOTFOUND';
-      error.syscall = 'getaddrinfo';
-      error.hostname = 'unknown_host.com';
-      error.host = 'unknown_host.com';
-      error.port = 80;
-      next(error);
-    }
-    (proxy as jest.Mock).mockImplementation(() => handleProxy);
+  describe('not mocked, performs real network requests, might fail', () => {
+    test('URL redirection with param', async () => {
+      const res = await request(app).get('/posts/1');
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(get_jsonplaceholder_typicode_com_posts_1);
+    });
 
-    const res = await request(app).get('/unknownHost');
-    expect(res.status).toEqual(500);
-    expect(res.serverError).toEqual(true);
-    expect(res.text).toMatch(/<title>Error<\/title>/);
-    expect(res.text).toMatch(/<pre>Error: getaddrinfo ENOTFOUND unknown_host\.com.*<\/pre>/);
-  });
+    test('URL redirection to unknown host', async () => {
+      const res = await request(app).get('/unknownHost');
+      expect(res.status).toEqual(500);
+      expect(res.serverError).toEqual(true);
+      expect(res.text).toMatch(/<title>Error<\/title>/);
+      expect(res.text).toMatch(/<pre>Error: getaddrinfo ENOTFOUND unknown_host\.com.*<\/pre>/);
+    });
 
-  test('POST multipart request', async () => {
-    function handleProxy(
-      _req: express.Request,
-      res: express.Response,
-      _next: express.NextFunction
-    ) {
-      res.status(200).send({
-        args: {},
-        data: {},
-        files: {
-          '1x1#000000.png':
-            'data:application/octet-stream;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACXBIWXMAAAsTAAALEwEAmpwYAAAACklEQVQIHWNgAAAAAgABz8g15QAAAABJRU5ErkJggg=='
-        },
-        form: {},
-        headers: {
-          'accept-encoding': 'gzip, deflate',
-          'content-length': '300',
-          'content-type':
-            'multipart/form-data; boundary=--------------------------579117600727930638952591',
-          host: 'postman-echo.com',
-          'user-agent': 'node-superagent/3.8.3',
-          'x-forwarded-port': '443',
-          'x-forwarded-proto': 'https'
-        },
-        json: null,
-        url: 'https://postman-echo.com/post'
-      });
-    }
-    (proxy as jest.Mock).mockImplementation(() => handleProxy);
+    test('POST multipart request', async () => {
+      // Image taken from https://github.com/aureooms/pixels/tree/2c1e39152339aa8323304d037aeeed1f9e6e24ab
 
-    // Image taken from https://github.com/aureooms/pixels/tree/2c1e39152339aa8323304d037aeeed1f9e6e24ab
+      const response = JSON.parse(JSON.stringify(post_postman_echo_com_post)); // Deep copy
+      response.headers['content-type'] = expect.any(String);
 
-    const res = await request(app)
-      .post('/post')
-      .attach('image', `${__dirname}/config-test/1x1#000000.png`);
-    expect(res.status).toEqual(200);
-    expect(res.body).toEqual({
-      args: {},
-      data: {},
-      files: {
-        '1x1#000000.png':
-          'data:application/octet-stream;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACXBIWXMAAAsTAAALEwEAmpwYAAAACklEQVQIHWNgAAAAAgABz8g15QAAAABJRU5ErkJggg=='
-      },
-      form: {},
-      headers: {
-        'accept-encoding': 'gzip, deflate',
-        'content-length': '300',
-        'content-type': expect.any(String),
-        host: 'postman-echo.com',
-        'user-agent': 'node-superagent/3.8.3',
-        'x-forwarded-port': '443',
-        'x-forwarded-proto': 'https'
-      },
-      json: null,
-      url: 'https://postman-echo.com/post'
+      const res = await request(app)
+        .post('/post')
+        .attach('image', `${__dirname}/config-test/1x1#000000.png`);
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(response);
     });
   });
 });
@@ -284,7 +311,7 @@ test('delay', async () => {
   expect(consoleSpy).toHaveBeenCalledTimes(2);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^post \/multiple\/verbs\/delay => \/.*\/stub-server\/config-test\/post_200_OK\.json, delay: (4|5) ms$/
+      /^post \/multiple\/verbs\/delay => \/.*\/config-test\/post_200_OK\.json, delay: (4|5) ms$/
     )
   );
 
@@ -294,7 +321,7 @@ test('delay', async () => {
   expect(consoleSpy).toHaveBeenCalledTimes(3);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^put \/multiple\/verbs\/delay => \/.*\/stub-server\/config-test\/put_200_OK\.json, delay: (4|5|6) ms$/
+      /^put \/multiple\/verbs\/delay => \/.*\/config-test\/put_200_OK\.json, delay: (4|5|6) ms$/
     )
   );
 

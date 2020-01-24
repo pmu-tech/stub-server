@@ -12,7 +12,7 @@ For each route, decide what will happen: a json stub, a piece of JS or use a rea
 
 - Use it with Express, [webpack-dev-server](https://github.com/webpack/webpack-dev-server) or the command line
 - Support stubs written in JSON, JS, TypeScript, HTML, jpg...
-- Can redirect requests to another host thx to [express-http-proxy](https://github.com/villadora/express-http-proxy)
+- Can redirect requests to another host thx to [node-http-proxy](https://github.com/http-party/node-http-proxy)
 - No need to restart stub-server if you modify a stub
 - The HTTP status code returned is determined from the stub filename: \*\_200\_\*.json, \*\_500\_\*.html...
 - Configurable delays to simulate slow APIs
@@ -36,12 +36,12 @@ webpack.config.ts
 ### stubs/config.ts
 
 ```TypeScript
-import path from 'path';
+import { resolve } from 'path';
 import { StubServerConfig } from '@pmu-tech/stub-server';
 
 const prod = 'https://pmu.fr';
 
-const stubsPath = path.resolve(__dirname, 'routes');
+const stubsPath = resolve(__dirname, 'routes');
 
 const config: StubServerConfig = {
   delay: { min: 500, max: 3000 },
