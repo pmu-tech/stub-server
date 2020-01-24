@@ -5,7 +5,6 @@ const proxy = createProxyServer({ changeOrigin: true });
 
 // Exported for testing purposes only, see [Jest mock inner function](https://stackoverflow.com/q/51269431)
 
-// istanbul ignore next
 export const send = (
   target: string,
   req: express.Request,
