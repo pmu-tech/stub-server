@@ -4,10 +4,15 @@
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 
+const cmd = require('commander');
 const express = require('express');
 const { resolve } = require('path');
 
 const { stubServer } = require('../dist/cjs/stubServer');
+
+cmd.option('-p, --port', 'stub server port').option('-c, --config', 'config file');
+
+cmd.parse(process.argv);
 
 // See https://en.wikipedia.org/wiki/ANSI_escape_code
 const ESC = {
@@ -18,9 +23,9 @@ const ESC = {
 /** @param {string} text */
 const emphasize = text => `${ESC.Bold}${ESC.Blue}${text}${ESC.Reset}`;
 
-const config = resolve('stubs/config');
+const config = resolve(cmd.config || 'stubs/config');
 const host = 'localhost';
-const port = 12345;
+const port = cmd.port || 12345;
 
 const app = express();
 
