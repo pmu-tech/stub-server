@@ -10,7 +10,7 @@ const { resolve } = require('path');
 
 const { stubServer } = require('../dist/cjs/stubServer');
 
-cmd.option('-p, --port', 'stub server port').option('-c, --config', 'config file');
+cmd.option('-p, --port <port>', 'stub server port').option('-c, --config <config>', 'config file');
 
 cmd.parse(process.argv);
 
@@ -25,7 +25,7 @@ const emphasize = text => `${ESC.Bold}${ESC.Blue}${text}${ESC.Reset}`;
 
 const config = resolve(cmd.config || 'stubs/config');
 const host = 'localhost';
-const port = cmd.port || 12345;
+const port = cmd.port ? Number(cmd.port) : 12345;
 
 const app = express();
 
