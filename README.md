@@ -8,7 +8,7 @@
 
 Stub server for REST APIs
 
-For each route, decide what will happen: a json stub, a piece of JS or use a real server
+For each route, decide what will happen: a JSON stub, a piece of JS or redirect to a real server
 
 - Use it with Express, [webpack-dev-server](https://github.com/webpack/webpack-dev-server) or the command line
 - Support stubs written in JSON, JS, TypeScript, HTML, jpg...
@@ -24,11 +24,17 @@ For each route, decide what will happen: a json stub, a piece of JS or use a rea
 ### Proposed file organization
 
 ```
-stubs/routes/my_api1_200_OK.json
-             my_api2_200_OK.jpg
-             my_api3_400_BadRequest_invalidField.ts
-             my_api4_400_BadRequest_invalidField.js
-             my_api5_500_InternalServerError.html
+stubs/routes/my_api1_get_200_OK.json
+             my_api2_get_200_OK.jpg
+             my_api3_post_400_BadRequest-invalidField.ts
+             my_api4_post_400_BadRequest-invalidField.js
+             my_api5_delete_500_InternalServerError.html
+             my_api7_get_200_OK.json
+             my_api7_post_200_OK.json
+             my_api7_get.ts
+             my_api8_get.ts
+             my_api9_get_200_OK-param1.json
+             my_api9_get_200_OK-param2.json
 stubs/config.ts
 webpack.config.ts
 ```
@@ -46,28 +52,28 @@ const stubsPath = resolve(__dirname, 'routes');
 const config: StubServerConfig = {
   delay: { min: 500, max: 3000 },
   routes: {
-    '/my/api1': { get: `${stubsPath}/get_my_api1_200_OK.json` },
-    '/my/api2': { get: `${stubsPath}/get_my_api2_200_OK.jpg` },
-    '/my/api3': { post: `${stubsPath}/post_my_api3_400_BadRequest-invalidField.ts` },
-    '/my/api4': { post: `${stubsPath}/post_my_api4_400_BadRequest-invalidField.js` },
-    '/my/api5': { delete: `${stubsPath}/delete_my_api5_500_InternalServerError.html` },
+    '/my/api1': { get: `${stubsPath}/my_api1_get_200_OK.json` },
+    '/my/api2': { get: `${stubsPath}/my_api2_get_200_OK.jpg` },
+    '/my/api3': { post: `${stubsPath}/my_api3_post_400_BadRequest-invalidField.ts` },
+    '/my/api4': { post: `${stubsPath}/my_api4_post_400_BadRequest-invalidField.js` },
+    '/my/api5': { delete: `${stubsPath}/my_api5_delete_500_InternalServerError.html` },
     '/my/api6/:id': { put: prod },
     '/my/api7': {
       delay: { min: 1000, max: 1000 },
-      get: `${stubsPath}/get_my_api7_200_OK.json`,
+      get: `${stubsPath}/my_api7_get_200_OK.json`,
       post: {
         delay: { min: 0, max: 0 },
-        response: `${stubsPath}/post_my_api7_200_OK.json`
+        response: `${stubsPath}/my_api7_post_200_OK.json`
       }
     },
-    '/my/api7': { get: `${stubsPath}/my_api7.ts`},
-    '/my/api8': { get: `${stubsPath}/my_api8.ts`},
-    '/my/api9/:id': { get: req => `${stubsPath}/my_api9_200_OK-${req.params.id}.json` }
+    '/my/api7': { get: `${stubsPath}/my_api7_get.ts`},
+    '/my/api8': { get: `${stubsPath}/my_api8_get.ts`},
+    '/my/api9/:id': { get: req => `${stubsPath}/my_api9_get_200_OK-${req.params.id}.json` }
   }
 };
 
 const rootApiPath = 'https://pmu.fr/client/:clientApi';
-config.routes[`${rootApiPath}/my/api7`] = { get: `${stubsPath}/my_api7_200_OK.json` };
+config.routes[`${rootApiPath}/my/api7`] = { get: `${stubsPath}/my_api7_get_200_OK.json` };
 
 export default config; // Or "exports.default = config"
 ```
@@ -101,7 +107,7 @@ import { stubServer } from '@pmu-tech/stub-server';
 
 Runs stub-server at http://127.0.0.1:12345 using `stubs/config`
 
-### stubs/routes/post_my_api3_400_BadRequest-invalidField.ts
+### stubs/routes/my_api3_post_400_BadRequest-invalidField.ts
 
 ```TypeScript
 export default {
@@ -109,7 +115,7 @@ export default {
 };
 ```
 
-### stubs/routes/post_my_api4_400_BadRequest-invalidField.js
+### stubs/routes/my_api4_post_400_BadRequest-invalidField.js
 
 ```JavaScript
 module.exports = {
@@ -117,7 +123,7 @@ module.exports = {
 };
 ```
 
-### stubs/routes/my_api7.ts
+### stubs/routes/my_api7_get.ts
 
 ```TypeScript
 import express from 'express';
@@ -127,7 +133,7 @@ export default function stub(req: express.Request, res: express.Response) {
 }
 ```
 
-### stubs/routes/my_api8.js
+### stubs/routes/my_api8_get.js
 
 ```JavaScript
 module.exports = (req, res) => {
