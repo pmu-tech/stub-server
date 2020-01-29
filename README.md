@@ -103,9 +103,14 @@ import { stubServer } from '@pmu-tech/stub-server';
 
 ### Command line
 
-`./node_modules/.bin/stub-server`
+```shell
+Usage: stub-server [options]
 
-Runs stub-server at http://127.0.0.1:12345 using `stubs/config`
+Options:
+  -p, --port <port>      stub server port (default: 12345)
+  -c, --config <config>  config file (default: "stubs/config")
+  -h, --help             output usage information
+```
 
 ### stubs/routes/my_api3_post_400_BadRequest-invalidField.ts
 

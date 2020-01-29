@@ -43,6 +43,7 @@
     "express": "^4.17.1"
   },
   "dependencies": {
+    "commander": "^4.1.0",
     "http-proxy": "^1.18.0"
   },
   "devDependencies": {
