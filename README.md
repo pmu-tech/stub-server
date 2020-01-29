@@ -101,8 +101,8 @@ import { stubServer } from '@pmu-tech/stub-server';
 Usage: stub-server [options]
 
 Options:
-  -p, --port <port>      stub server port
-  -c, --config <config>  config file
+  -p, --port <port>      stub server port (default: 12345)
+  -c, --config <config>  config file (default: "stubs/config")
   -h, --help             output usage information
 ```
 
