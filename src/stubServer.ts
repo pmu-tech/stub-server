@@ -63,7 +63,10 @@ async function parseConfig(apiPath: string, req: express.Request) {
   const { delay: routeDelay, ...responses } = route;
 
   const httpVerb = req.method as HTTPVerb;
-  const stub = responses[httpVerb]!;
+  const stub =
+    responses[httpVerb]! ??
+    // Compatibility with lower case HTTP verbs
+    responses[httpVerb.toLowerCase() as HTTPVerb];
 
   let name: URL | StubFilename;
   let delay: Delay | undefined;
