@@ -18,23 +18,23 @@ describe('files', () => {
   test('file without HTTP status', async () => {
     const res = await request(app).get('/get/json/noHttpStatus');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'get_noHttpStatus.json' });
+    expect(res.body).toEqual({ stub: 'GET_noHttpStatus.json' });
   });
 
   test('json file does not exist', async () => {
-    // Crash with "Cannot find module 'config-test/get_200_OK-noFile.json' from 'stubServer.ts'"
+    // Crash with "Cannot find module 'config-test/GET_200_OK-noFile.json' from 'stubServer.ts'"
     // await request(app).get('/get/json/noFile');
   });
 
   test('png file does not exist', async () => {
-    // Crash with "ENOENT: no such file or directory, open 'config-test/get_200_OK-noFile.png'"
+    // Crash with "ENOENT: no such file or directory, open 'config-test/GET_200_OK-noFile.png'"
     // await request(app).get('/get/png/noFile');
   });
 
   test('json', async () => {
     const res = await request(app).get('/get/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'get_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'GET_200_OK.json' });
   });
 
   test('png', async () => {
@@ -49,20 +49,20 @@ describe('files', () => {
   test('ts', async () => {
     const res = await request(app).get('/get/ts');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'get_ts_200_OK.ts' });
+    expect(res.body).toEqual({ stub: 'GET_ts_200_OK.ts' });
   });
 
   test('js', async () => {
     const res = await request(app).get('/get/js');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'get_js_200_OK.js' });
+    expect(res.body).toEqual({ stub: 'GET_js_200_OK.js' });
   });
 
   test('html', async () => {
     const res = await request(app).get('/get/html');
     expect(res.status).toEqual(200);
     const html = (res.body as Buffer).toString();
-    expect(html).toEqual('<!DOCTYPE html>\n<title>get_html_200_OK.html</title>\n');
+    expect(html).toEqual('<!DOCTYPE html>\n<title>GET_html_200_OK.html</title>\n');
   });
 });
 
@@ -70,19 +70,19 @@ describe('HTTP status codes', () => {
   test('invalid HTTP status code', async () => {
     const res = await request(app).get('/get/666_invalidHttpStatus');
     expect(res.status).toEqual(666);
-    expect(res.body).toEqual({ stub: 'get_666_invalidHttpStatus.json' });
+    expect(res.body).toEqual({ stub: 'GET_666_invalidHttpStatus.json' });
   });
 
   test('400 Bad Request', async () => {
     const res = await request(app).get('/get/400_BadRequest');
     expect(res.status).toEqual(400);
-    expect(res.body).toEqual({ stub: 'get_400_BadRequest.json' });
+    expect(res.body).toEqual({ stub: 'GET_400_BadRequest.json' });
   });
 
   test('500 Internal Server Error', async () => {
     const res = await request(app).get('/get/500_InternalServerError');
     expect(res.status).toEqual(500);
-    expect(res.body).toEqual({ stub: 'get_500_InternalServerError.json' });
+    expect(res.body).toEqual({ stub: 'GET_500_InternalServerError.json' });
   });
 
   test('204 No Content', async () => {
@@ -102,58 +102,58 @@ describe('HTTP verbs', () => {
   test('GET', async () => {
     const res = await request(app).get('/get/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'get_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'GET_200_OK.json' });
   });
 
   test('POST', async () => {
     const res = await request(app).post('/post/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'post_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'POST_200_OK.json' });
   });
 
   test('PUT', async () => {
     const res = await request(app).put('/put/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'put_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'PUT_200_OK.json' });
   });
 
   test('PATCH', async () => {
     const res = await request(app).patch('/patch/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'patch_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'PATCH_200_OK.json' });
   });
 
   test('DELETE', async () => {
     const res = await request(app).delete('/delete/json');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'delete_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'DELETE_200_OK.json' });
   });
 
   test('multiple verbs', async () => {
     let res = await request(app).get('/multiple/verbs');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'get_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'GET_200_OK.json' });
 
     res = await request(app).post('/multiple/verbs');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'post_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'POST_200_OK.json' });
 
     res = await request(app).put('/multiple/verbs');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'put_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'PUT_200_OK.json' });
 
     res = await request(app).patch('/multiple/verbs');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'patch_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'PATCH_200_OK.json' });
 
     res = await request(app).delete('/multiple/verbs');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'delete_200_OK.json' });
+    expect(res.body).toEqual({ stub: 'DELETE_200_OK.json' });
   });
 });
 
 describe('proxy', () => {
-  const get_jsonplaceholder_typicode_com_posts_1 = {
+  const GET_jsonplaceholder_typicode_com_posts_1 = {
     userId: 1,
     id: 1,
     title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
@@ -161,7 +161,7 @@ describe('proxy', () => {
       'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
   };
 
-  const post_postman_echo_com_post = {
+  const POST_postman_echo_com_post = {
     args: {},
     data: {},
     files: {
@@ -193,13 +193,13 @@ describe('proxy', () => {
             _req: express.Request,
             res: express.Response,
             _next: express.NextFunction
-          ) => res.status(200).send(get_jsonplaceholder_typicode_com_posts_1)
+          ) => res.status(200).send(GET_jsonplaceholder_typicode_com_posts_1)
         );
 
       const res = await request(app).get('/posts/1');
       expect(sendToProxyMock).toHaveBeenCalledTimes(1);
       expect(res.status).toEqual(200);
-      expect(res.body).toEqual(get_jsonplaceholder_typicode_com_posts_1);
+      expect(res.body).toEqual(GET_jsonplaceholder_typicode_com_posts_1);
 
       sendToProxyMock.mockRestore();
     });
@@ -246,7 +246,7 @@ describe('proxy', () => {
             _req: express.Request,
             res: express.Response,
             _next: express.NextFunction
-          ) => res.status(200).send(post_postman_echo_com_post)
+          ) => res.status(200).send(POST_postman_echo_com_post)
         );
 
       // Image taken from https://github.com/aureooms/pixels/tree/2c1e39152339aa8323304d037aeeed1f9e6e24ab
@@ -256,7 +256,7 @@ describe('proxy', () => {
         .attach('image', `${__dirname}/config-test/1x1#000000.png`);
       expect(sendToProxyMock).toHaveBeenCalledTimes(1);
       expect(res.status).toEqual(200);
-      expect(res.body).toEqual(post_postman_echo_com_post);
+      expect(res.body).toEqual(POST_postman_echo_com_post);
 
       sendToProxyMock.mockRestore();
     });
@@ -266,7 +266,7 @@ describe('proxy', () => {
     test('URL redirection with param', async () => {
       const res = await request(app).get('/posts/1');
       expect(res.status).toEqual(200);
-      expect(res.body).toEqual(get_jsonplaceholder_typicode_com_posts_1);
+      expect(res.body).toEqual(GET_jsonplaceholder_typicode_com_posts_1);
     });
 
     test('URL redirection to unknown host', async () => {
@@ -280,7 +280,7 @@ describe('proxy', () => {
     test('POST multipart request', async () => {
       // Image taken from https://github.com/aureooms/pixels/tree/2c1e39152339aa8323304d037aeeed1f9e6e24ab
 
-      const response = JSON.parse(JSON.stringify(post_postman_echo_com_post)); // Deep copy
+      const response = JSON.parse(JSON.stringify(POST_postman_echo_com_post)); // Deep copy
       response.headers['content-type'] = expect.any(String);
 
       const res = await request(app)
@@ -297,31 +297,31 @@ test('delay', async () => {
 
   let res = await request(app).get('/multiple/verbs/delay');
   expect(res.status).toEqual(200);
-  expect(res.body).toEqual({ stub: 'get_200_OK.json' });
+  expect(res.body).toEqual({ stub: 'GET_200_OK.json' });
   expect(consoleSpy).toHaveBeenCalledTimes(1);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^get \/multiple\/verbs\/delay => \/.*\/config-test\/get_200_OK\.json, delay: (2|3) ms$/
+      /^GET \/multiple\/verbs\/delay => \/.*\/config-test\/GET_200_OK\.json, delay: (2|3) ms$/
     )
   );
 
   res = await request(app).post('/multiple/verbs/delay');
   expect(res.status).toEqual(200);
-  expect(res.body).toEqual({ stub: 'post_200_OK.json' });
+  expect(res.body).toEqual({ stub: 'POST_200_OK.json' });
   expect(consoleSpy).toHaveBeenCalledTimes(2);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^post \/multiple\/verbs\/delay => \/.*\/config-test\/post_200_OK\.json, delay: (4|5) ms$/
+      /^POST \/multiple\/verbs\/delay => \/.*\/config-test\/POST_200_OK\.json, delay: (4|5) ms$/
     )
   );
 
   res = await request(app).put('/multiple/verbs/delay');
   expect(res.status).toEqual(200);
-  expect(res.body).toEqual({ stub: 'put_200_OK.json' });
+  expect(res.body).toEqual({ stub: 'PUT_200_OK.json' });
   expect(consoleSpy).toHaveBeenCalledTimes(3);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^put \/multiple\/verbs\/delay => \/.*\/config-test\/put_200_OK\.json, delay: (4|5|6) ms$/
+      /^PUT \/multiple\/verbs\/delay => \/.*\/config-test\/PUT_200_OK\.json, delay: (4|5|6) ms$/
     )
   );
 
@@ -386,12 +386,12 @@ describe('get stub name from function', () => {
   test('no response property', async () => {
     const res = await request(app).get('/function/param');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'get_function_200_OK-param.json' });
+    expect(res.body).toEqual({ stub: 'GET_function_200_OK-param.json' });
   });
 
   test('with response property', async () => {
     const res = await request(app).post('/function/param');
     expect(res.status).toEqual(201);
-    expect(res.body).toEqual({ stub: 'post_function_201_Created-param.json' });
+    expect(res.body).toEqual({ stub: 'POST_function_201_Created-param.json' });
   });
 });

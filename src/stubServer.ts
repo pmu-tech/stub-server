@@ -3,7 +3,7 @@ import fs from 'fs';
 
 import { send } from './proxy';
 
-type HTTPVerb = 'get' | 'post' | 'put' | 'patch' | 'delete';
+type HTTPVerb = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 type URL = string;
 type StubFilename = string;
@@ -62,7 +62,7 @@ async function parseConfig(apiPath: string, req: express.Request) {
 
   const { delay: routeDelay, ...responses } = route;
 
-  const httpVerb = req.method.toLowerCase() as HTTPVerb;
+  const httpVerb = req.method as HTTPVerb;
   const stub = responses[httpVerb]!;
 
   let name: URL | StubFilename;
@@ -138,6 +138,8 @@ async function processStubRequest(
   }
 }
 
+type ExpressRoute = 'get' | 'post' | 'put' | 'patch' | 'delete';
+
 export function stubServer(configPath: string, app: express.Application) {
   // Do not use asynchronous code here otherwise routes will
   // be defined after the ones from webpack-dev-server
@@ -150,7 +152,7 @@ export function stubServer(configPath: string, app: express.Application) {
     Object.keys(route).forEach(httpVerb => {
       if (httpVerb !== 'delay') {
         // If invalid HTTP verb, crash with "TypeError: app[httpVerb] is not a function"
-        app[httpVerb as HTTPVerb](apiPath, (req, res, next) =>
+        app[httpVerb.toLowerCase() as ExpressRoute](apiPath, (req, res, next) =>
           processStubRequest(apiPath, req, res, next)
         );
       }
