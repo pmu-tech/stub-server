@@ -4,7 +4,7 @@
     "noEmit": false,
 
     // Cannot use "esnext" because Node.js 12 does not support nullish coalescing operator (??)
-    "target": "es2020"
+    "target": "es2019"
   },
   "files": ["src/stubServer.ts"]
 }

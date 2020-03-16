@@ -8,6 +8,6 @@ const stubsPath = resolve(__dirname, '../src/config-test');
 
 exports.default = {
   routes: {
-    '/get/json': { get: `${stubsPath}/get_200_OK.json` }
+    '/get/json': { GET: `${stubsPath}/GET_200_OK.json` }
   }
 };

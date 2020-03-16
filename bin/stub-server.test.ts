@@ -79,7 +79,7 @@ test('network request', done => {
 
         res.on('close', () => {
           expect(res.statusCode).toEqual(200);
-          expect(JSON.parse(resData)).toEqual({ stub: 'get_200_OK.json' });
+          expect(JSON.parse(resData)).toEqual({ stub: 'GET_200_OK.json' });
 
           process.kill();
         });

@@ -24,17 +24,17 @@ For each route, decide what will happen: a JSON stub, a piece of JS or redirect 
 ### Proposed file organization
 
 ```
-stubs/routes/my_api1_get_200_OK.json
-             my_api2_get_200_OK.jpg
-             my_api3_post_400_BadRequest-invalidField.ts
-             my_api4_post_400_BadRequest-invalidField.js
-             my_api5_delete_500_InternalServerError.html
-             my_api7_get_200_OK.json
-             my_api7_post_200_OK.json
-             my_api7_get.ts
-             my_api8_get.ts
-             my_api9_get_200_OK-param1.json
-             my_api9_get_200_OK-param2.json
+stubs/routes/my_api1_GET_200_OK.json
+             my_api2_GET_200_OK.jpg
+             my_api3_POST_400_BadRequest-invalidField.ts
+             my_api4_POST_400_BadRequest-invalidField.js
+             my_api5_DELETE_500_InternalServerError.html
+             my_api7_GET_200_OK.json
+             my_api7_POST_200_OK.json
+             my_api7_GET.ts
+             my_api8_GET.ts
+             my_api9_GET_200_OK-param1.json
+             my_api9_GET_200_OK-param2.json
 stubs/config.ts
 webpack.config.ts
 ```
@@ -52,28 +52,28 @@ const stubsPath = resolve(__dirname, 'routes');
 const config: StubServerConfig = {
   delay: { min: 500, max: 3000 },
   routes: {
-    '/my/api1': { get: `${stubsPath}/my_api1_get_200_OK.json` },
-    '/my/api2': { get: `${stubsPath}/my_api2_get_200_OK.jpg` },
-    '/my/api3': { post: `${stubsPath}/my_api3_post_400_BadRequest-invalidField.ts` },
-    '/my/api4': { post: `${stubsPath}/my_api4_post_400_BadRequest-invalidField.js` },
-    '/my/api5': { delete: `${stubsPath}/my_api5_delete_500_InternalServerError.html` },
-    '/my/api6/:id': { put: prod },
+    '/my/api1': { GET: `${stubsPath}/my_api1_GET_200_OK.json` },
+    '/my/api2': { GET: `${stubsPath}/my_api2_GET_200_OK.jpg` },
+    '/my/api3': { POST: `${stubsPath}/my_api3_POST_400_BadRequest-invalidField.ts` },
+    '/my/api4': { POST: `${stubsPath}/my_api4_POST_400_BadRequest-invalidField.js` },
+    '/my/api5': { DELETE: `${stubsPath}/my_api5_DELETE_500_InternalServerError.html` },
+    '/my/api6/:id': { PUT: prod },
     '/my/api7': {
       delay: { min: 1000, max: 1000 },
-      get: `${stubsPath}/my_api7_get_200_OK.json`,
-      post: {
+      GET: `${stubsPath}/my_api7_GET_200_OK.json`,
+      POST: {
         delay: { min: 0, max: 0 },
-        response: `${stubsPath}/my_api7_post_200_OK.json`
+        response: `${stubsPath}/my_api7_POST_200_OK.json`
       }
     },
-    '/my/api7': { get: `${stubsPath}/my_api7_get.ts`},
-    '/my/api8': { get: `${stubsPath}/my_api8_get.ts`},
-    '/my/api9/:id': { get: req => `${stubsPath}/my_api9_get_200_OK-${req.params.id}.json` }
+    '/my/api7': { GET: `${stubsPath}/my_api7_GET.ts`},
+    '/my/api8': { GET: `${stubsPath}/my_api8_GET.ts`},
+    '/my/api9/:id': { GET: req => `${stubsPath}/my_api9_GET_200_OK-${req.params.id}.json` }
   }
 };
 
 const rootApiPath = 'https://pmu.fr/client/:clientApi';
-config.routes[`${rootApiPath}/my/api7`] = { get: `${stubsPath}/my_api7_get_200_OK.json` };
+config.routes[`${rootApiPath}/my/api7`] = { GET: `${stubsPath}/my_api7_GET_200_OK.json` };
 
 export default config; // Or "exports.default = config"
 ```
@@ -112,7 +112,7 @@ Options:
   -h, --help             output usage information
 ```
 
-### stubs/routes/my_api3_post_400_BadRequest-invalidField.ts
+### stubs/routes/my_api3_POST_400_BadRequest-invalidField.ts
 
 ```TypeScript
 export default {
@@ -120,7 +120,7 @@ export default {
 };
 ```
 
-### stubs/routes/my_api4_post_400_BadRequest-invalidField.js
+### stubs/routes/my_api4_POST_400_BadRequest-invalidField.js
 
 ```JavaScript
 module.exports = {
@@ -128,7 +128,7 @@ module.exports = {
 };
 ```
 
-### stubs/routes/my_api7_get.ts
+### stubs/routes/my_api7_GET.ts
 
 ```TypeScript
 import express from 'express';
@@ -138,7 +138,7 @@ export default function stub(req: express.Request, res: express.Response) {
 }
 ```
 
-### stubs/routes/my_api8_get.js
+### stubs/routes/my_api8_GET.js
 
 ```JavaScript
 module.exports = (req, res) => {
