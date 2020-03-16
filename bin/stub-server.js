@@ -11,7 +11,7 @@ const { resolve } = require('path');
 const { stubServer } = require('../dist/cjs/stubServer');
 
 cmd
-  .option('-p, --port <port>', 'stub server port', 12345)
+  .option('-p, --port <port>', 'stub server port', '12345')
   .option('-c, --config <config>', 'config file', 'stubs/config');
 
 cmd.parse(process.argv);
