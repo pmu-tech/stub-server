@@ -31,10 +31,10 @@ stubs/routes/my_api1_GET_200_OK.json
              my_api5_DELETE_500_InternalServerError.html
              my_api7_GET_200_OK.json
              my_api7_POST_200_OK.json
-             my_api7_GET.ts
              my_api8_GET.ts
-             my_api9_GET_200_OK-param1.json
-             my_api9_GET_200_OK-param2.json
+             my_api9_GET.js
+             my_api10_GET_200_OK-param1.json
+             my_api10_GET_200_OK-param2.json
 stubs/config.ts
 webpack.config.ts
 ```
@@ -66,9 +66,9 @@ const config: StubServerConfig = {
         response: `${stubsPath}/my_api7_POST_200_OK.json`
       }
     },
-    '/my/api7': { GET: `${stubsPath}/my_api7_GET.ts`},
     '/my/api8': { GET: `${stubsPath}/my_api8_GET.ts`},
-    '/my/api9/:id': { GET: req => `${stubsPath}/my_api9_GET_200_OK-${req.params.id}.json` }
+    '/my/api9': { GET: `${stubsPath}/my_api9_GET.js`},
+    '/my/api10/:id': { GET: req => `${stubsPath}/my_api10_GET_200_OK-${req.params.id}.json` }
   }
 };
 
@@ -101,22 +101,19 @@ import { stubServer } from '@pmu-tech/stub-server';
 // ...
 ```
 
-### Command line
+### stubs/routes/my_api1_GET_200_OK.json
 
-```shell
-Usage: stub-server [options]
-
-Options:
-  -p, --port <port>      stub server port (default: 12345)
-  -c, --config <config>  config file (default: "stubs/config")
-  -h, --help             output usage information
+```JSON
+{
+  "foo": "bar"
+}
 ```
 
 ### stubs/routes/my_api3_POST_400_BadRequest-invalidField.ts
 
 ```TypeScript
 export default {
-  errorMessage: 'Invalid field'
+  error: 'Invalid field'
 };
 ```
 
@@ -124,11 +121,11 @@ export default {
 
 ```JavaScript
 module.exports = {
-  errorMessage: 'Invalid field'
+  error: 'Invalid field'
 };
 ```
 
-### stubs/routes/my_api7_GET.ts
+### stubs/routes/my_api8_GET.ts
 
 ```TypeScript
 import express from 'express';
@@ -138,12 +135,23 @@ export default function stub(req: express.Request, res: express.Response) {
 }
 ```
 
-### stubs/routes/my_api8_GET.js
+### stubs/routes/my_api9_GET.js
 
 ```JavaScript
 module.exports = (req, res) => {
   res.send('Hello, World!');
 };
+```
+
+### Command line
+
+```
+Usage: stub-server [options]
+
+Options:
+  -p, --port <port>      stub server port (default: "12345")
+  -c, --config <config>  config file (default: "stubs/config")
+  -h, --help             display help for command
 ```
 
 ## Contributing
