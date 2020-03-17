@@ -154,6 +154,53 @@ Options:
   -h, --help             display help for command
 ```
 
+## Next.js
+
+```JavaScript
+// server.js
+
+const { resolve } = require('path');
+const express = require('express');
+const next = require('next');
+const Log = require('next/dist/build/output/log');
+const { stubServer } = require('@pmu-tech/stub-server');
+
+const port = 3000;
+
+const configPath = resolve(__dirname, 'stubs', 'config');
+
+const dev = process.env.NODE_ENV !== 'production';
+const app = next({ dev });
+const handle = app.getRequestHandler();
+
+app.prepare().then(() => {
+  const server = express();
+
+  stubServer(configPath, server);
+
+  server.all('*', (req, res) => handle(req, res));
+
+  server.listen(port, err => {
+    if (err) throw err;
+
+    // https://github.com/zeit/next.js/blob/v9.3.1/packages/next/build/output/store.ts#L85-L88
+    Log.ready(`ready on port ${port}`);
+  });
+});
+```
+
+```JavaScript
+// package.json
+
+{
+  "scripts": {
+    "dev": "node server.js", // Instead of "next dev"
+    "build": "next build",
+    "start": "next start"
+  }
+}
+```
+
 ## Contributing
 
 ### Prerequisites
