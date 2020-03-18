@@ -26,7 +26,7 @@ export interface StubServerConfig {
 }
 
 // Allows to modify the imported files without restarting the server
-// See [node.js require() cache - possible to invalidate?](https://stackoverflow.com/a/16060619)
+// [node.js require() cache - possible to invalidate?](https://stackoverflow.com/a/16060619)
 function deleteRequireCache(module: string) {
   delete require.cache[require.resolve(module)];
 }
@@ -35,8 +35,8 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function randomDelay(min: number, max: number) {
   // We could do better by allowing different number distributions
-  // See [Generate random number with a non-uniform distribution](https://stackoverflow.com/q/16110758)
-  // See [Generate random number between two numbers in JavaScript](https://stackoverflow.com/a/7228322/990356)
+  // [Generate random number with a non-uniform distribution](https://stackoverflow.com/q/16110758)
+  // [Generate random number between two numbers in JavaScript](https://stackoverflow.com/a/7228322/990356)
   const delay = Math.floor(Math.random() * (max - min + 1)) + min;
   await sleep(delay);
   return delay;

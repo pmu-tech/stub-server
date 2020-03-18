@@ -7,7 +7,7 @@ const bin = './bin/stub-server.js';
 const correctConfig = 'bin/config-test';
 const correctPort = '16928';
 
-// See https://en.cppreference.com/w/cpp/utility/program/EXIT_status
+// https://en.cppreference.com/w/cpp/utility/program/EXIT_status
 // @ts-ignore
 const EXIT_SUCCESS = 0;
 const EXIT_FAILURE = 1;
@@ -17,7 +17,7 @@ const EXIT_SIGTERM = null;
 const killStubServerAfterRunning = (process: ChildProcessWithoutNullStreams) =>
   setTimeout(() => process.kill(), 300 /* Wait for stub-server to start */);
 
-// See [Remove all ANSI colors/styles from strings](https://stackoverflow.com/q/25245716)
+// [Remove all ANSI colors/styles from strings](https://stackoverflow.com/q/25245716)
 const cleanAnsi = (str: string) =>
   // eslint-disable-next-line no-control-regex
   str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');

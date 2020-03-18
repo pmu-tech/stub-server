@@ -1,6 +1,7 @@
 // @ts-check
 
-module.exports = {
+/** @type {import('eslint').Linter.Config} */
+const config = {
   parser: '@typescript-eslint/parser',
   parserOptions: {},
   extends: [
@@ -37,3 +38,5 @@ module.exports = {
     '@typescript-eslint/ban-ts-ignore': 'off'
   }
 };
+
+module.exports = config;

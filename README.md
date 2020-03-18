@@ -1,7 +1,7 @@
 # @pmu-tech/stub-server
 
 [![npm version](https://badge.fury.io/js/%40pmu-tech%2Fstub-server.svg)](https://www.npmjs.com/package/@pmu-tech/stub-server)
-![Build Status](https://github.com/pmu-tech/stub-server/workflows/Node%20CI/badge.svg)
+[![Node.js CI](https://github.com/pmu-tech/stub-server/workflows/Node.js%20CI/badge.svg)](https://github.com/pmu-tech/stub-server/actions)
 [![npm bundle size](https://img.shields.io/bundlephobia/min/%40pmu-tech/stub-server.svg)](https://bundlephobia.com/result?p=@pmu-tech/stub-server)
 [![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![Airbnb Code Style](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)

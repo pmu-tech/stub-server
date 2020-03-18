@@ -16,7 +16,7 @@ cmd
 
 cmd.parse(process.argv);
 
-// See https://en.wikipedia.org/wiki/ANSI_escape_code
+// https://en.wikipedia.org/wiki/ANSI_escape_code
 const ESC = {
   Reset: '\x1b[0m',
   Bold: '\x1b[1m',
