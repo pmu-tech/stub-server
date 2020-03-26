@@ -129,8 +129,7 @@ async function processStubRequest(
 
     if (fileContent !== undefined) {
       const match = /_(\d+)_[a-zA-Z]+/.exec(filename);
-      const httpStatus =
-          match !== null ? Number(match![1]) : 200 /* Default HTTP status if none specified */;
+      const httpStatus = match !== null ? Number(match![1]) : 200; // 200: default HTTP status if none specified
 
       if (httpStatus === 204 /* No Content */) {
         res.status(httpStatus).end();
