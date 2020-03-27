@@ -1,6 +1,6 @@
+import express from 'express';
 import { resolve } from 'path';
 import request from 'supertest';
-import express from 'express';
 
 import * as proxy from './proxy';
 import { stubServer } from './stubServer';
