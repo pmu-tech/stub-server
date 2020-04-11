@@ -1,6 +1,6 @@
+import express from 'express';
 import { resolve } from 'path';
 import request from 'supertest';
-import express from 'express';
 
 import * as proxy from './proxy';
 import { stubServer } from './stubServer';
@@ -21,11 +21,13 @@ describe('files', () => {
     expect(res.body).toEqual({ stub: 'GET_noHttpStatus.json' });
   });
 
+  // eslint-disable-next-line jest/expect-expect
   test('json file does not exist', async () => {
     // Crash with "Cannot find module 'config-test/GET_200_OK-noFile.json' from 'stubServer.ts'"
     // await request(app).get('/get/json/noFile');
   });
 
+  // eslint-disable-next-line jest/expect-expect
   test('png file does not exist', async () => {
     // Crash with "ENOENT: no such file or directory, open 'config-test/GET_200_OK-noFile.png'"
     // await request(app).get('/get/png/noFile');
@@ -94,6 +96,7 @@ describe('HTTP status codes', () => {
 });
 
 describe('HTTP verbs', () => {
+  // eslint-disable-next-line jest/expect-expect
   test('unknown HTTP verb', () => {
     // If config.ts contains an invalid HTTP verb, then stubServer.ts crashes with:
     // TypeError: app[method] is not a function
@@ -356,6 +359,7 @@ describe('express request handler', () => {
       expect(res.body).toEqual({ param: 'sendAsync' });
     });
 
+    // eslint-disable-next-line jest/expect-expect
     test('res.status()', async () => {
       // Timeout - Async callback was not invoked within the 5000ms timeout specified by jest.setTimeout.Timeout
       // await request(app).get('/get/express/ts/status');
@@ -368,6 +372,7 @@ describe('express request handler', () => {
       expect(res.text).toEqual('');
     });
 
+    // eslint-disable-next-line jest/expect-expect
     test('do nothing"', async () => {
       // Timeout - Async callback was not invoked within the 5000ms timeout specified by jest.setTimeout.Timeout
       // await request(app).get('/get/express/ts/doNothing');

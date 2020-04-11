@@ -1,8 +1,8 @@
 # @pmu-tech/stub-server
 
 [![npm version](https://badge.fury.io/js/%40pmu-tech%2Fstub-server.svg)](https://www.npmjs.com/package/@pmu-tech/stub-server)
-![Build Status](https://github.com/pmu-tech/stub-server/workflows/Node%20CI/badge.svg)
-[![npm bundle size](https://img.shields.io/bundlephobia/min/%40pmu-tech/stub-server.svg)](https://bundlephobia.com/result?p=@pmu-tech/stub-server)
+[![Node.js CI](https://github.com/pmu-tech/stub-server/workflows/Node.js%20CI/badge.svg)](https://github.com/pmu-tech/stub-server/actions)
+[![Bundle size](https://badgen.net/bundlephobia/minzip/@pmu-tech/stub-server)](https://bundlephobia.com/result?p=@pmu-tech/stub-server)
 [![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![Airbnb Code Style](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
 
@@ -31,10 +31,10 @@ stubs/routes/my_api1_GET_200_OK.json
              my_api5_DELETE_500_InternalServerError.html
              my_api7_GET_200_OK.json
              my_api7_POST_200_OK.json
-             my_api7_GET.ts
              my_api8_GET.ts
-             my_api9_GET_200_OK-param1.json
-             my_api9_GET_200_OK-param2.json
+             my_api9_GET.js
+             my_api10_GET_200_OK-param1.json
+             my_api10_GET_200_OK-param2.json
 stubs/config.ts
 webpack.config.ts
 ```
@@ -66,9 +66,9 @@ const config: StubServerConfig = {
         response: `${stubsPath}/my_api7_POST_200_OK.json`
       }
     },
-    '/my/api7': { GET: `${stubsPath}/my_api7_GET.ts`},
     '/my/api8': { GET: `${stubsPath}/my_api8_GET.ts`},
-    '/my/api9/:id': { GET: req => `${stubsPath}/my_api9_GET_200_OK-${req.params.id}.json` }
+    '/my/api9': { GET: `${stubsPath}/my_api9_GET.js`},
+    '/my/api10/:id': { GET: req => `${stubsPath}/my_api10_GET_200_OK-${req.params.id}.json` }
   }
 };
 
@@ -101,22 +101,19 @@ import { stubServer } from '@pmu-tech/stub-server';
 // ...
 ```
 
-### Command line
+### stubs/routes/my_api1_GET_200_OK.json
 
-```shell
-Usage: stub-server [options]
-
-Options:
-  -p, --port <port>      stub server port (default: 12345)
-  -c, --config <config>  config file (default: "stubs/config")
-  -h, --help             output usage information
+```JSON
+{
+  "foo": "bar"
+}
 ```
 
 ### stubs/routes/my_api3_POST_400_BadRequest-invalidField.ts
 
 ```TypeScript
 export default {
-  errorMessage: 'Invalid field'
+  error: 'Invalid field'
 };
 ```
 
@@ -124,11 +121,11 @@ export default {
 
 ```JavaScript
 module.exports = {
-  errorMessage: 'Invalid field'
+  error: 'Invalid field'
 };
 ```
 
-### stubs/routes/my_api7_GET.ts
+### stubs/routes/my_api8_GET.ts
 
 ```TypeScript
 import express from 'express';
@@ -138,12 +135,70 @@ export default function stub(req: express.Request, res: express.Response) {
 }
 ```
 
-### stubs/routes/my_api8_GET.js
+### stubs/routes/my_api9_GET.js
 
 ```JavaScript
 module.exports = (req, res) => {
   res.send('Hello, World!');
 };
+```
+
+### Command line
+
+```
+Usage: stub-server [options]
+
+Options:
+  -p, --port <port>      stub server port (default: "12345")
+  -c, --config <config>  config file (default: "stubs/config")
+  -h, --help             display help for command
+```
+
+## Next.js
+
+```JavaScript
+// server.js
+
+const { resolve } = require('path');
+const express = require('express');
+const next = require('next');
+const Log = require('next/dist/build/output/log');
+const { stubServer } = require('@pmu-tech/stub-server');
+
+const port = 3000;
+
+const configPath = resolve(__dirname, 'stubs', 'config');
+
+const dev = process.env.NODE_ENV !== 'production';
+const app = next({ dev });
+const handle = app.getRequestHandler();
+
+app.prepare().then(() => {
+  const server = express();
+
+  stubServer(configPath, server);
+
+  server.all('*', (req, res) => handle(req, res));
+
+  server.listen(port, err => {
+    if (err) throw err;
+
+    // https://github.com/zeit/next.js/blob/v9.3.1/packages/next/build/output/store.ts#L85-L88
+    Log.ready(`ready on port ${port}`);
+  });
+});
+```
+
+```JavaScript
+// package.json
+
+{
+  "scripts": {
+    "dev": "node server.js", // Instead of "next dev"
+    "build": "next build",
+    "start": "next start"
+  }
+}
 ```
 
 ## Contributing

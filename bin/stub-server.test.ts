@@ -1,4 +1,4 @@
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import http from 'http';
 
 // If something goes wrong with these tests, use "killall node"
@@ -7,7 +7,7 @@ const bin = './bin/stub-server.js';
 const correctConfig = 'bin/config-test';
 const correctPort = '16928';
 
-// See https://en.cppreference.com/w/cpp/utility/program/EXIT_status
+// https://en.cppreference.com/w/cpp/utility/program/EXIT_status
 // @ts-ignore
 const EXIT_SUCCESS = 0;
 const EXIT_FAILURE = 1;
@@ -17,11 +17,12 @@ const EXIT_SIGTERM = null;
 const killStubServerAfterRunning = (process: ChildProcessWithoutNullStreams) =>
   setTimeout(() => process.kill(), 300 /* Wait for stub-server to start */);
 
-// See [Remove all ANSI colors/styles from strings](https://stackoverflow.com/q/25245716)
+// [Remove all ANSI colors/styles from strings](https://stackoverflow.com/q/25245716)
 const cleanAnsi = (str: string) =>
   // eslint-disable-next-line no-control-regex
   str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 
+// eslint-disable-next-line jest/no-test-callback
 test('correct config param', done => {
   expect.assertions(2);
 
@@ -42,6 +43,7 @@ test('correct config param', done => {
   killStubServerAfterRunning(process);
 });
 
+// eslint-disable-next-line jest/no-test-callback
 test('correct config and port params', done => {
   expect.assertions(2);
 
@@ -62,6 +64,7 @@ test('correct config and port params', done => {
   killStubServerAfterRunning(process);
 });
 
+// eslint-disable-next-line jest/no-test-callback
 test('network request', done => {
   // Unfortunately it does not test CORS because the request is performed server side :-/
   // Users perform requests in a web browser where CORS is enabled
@@ -95,6 +98,7 @@ test('network request', done => {
   });
 });
 
+// eslint-disable-next-line jest/no-test-callback
 test('incorrect config param', done => {
   expect.assertions(2);
 
@@ -111,6 +115,7 @@ test('incorrect config param', done => {
   });
 });
 
+// eslint-disable-next-line jest/no-test-callback
 test('incorrect port param', done => {
   expect.assertions(2);
 

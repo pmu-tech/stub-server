@@ -42,7 +42,7 @@ const config: StubServerConfig = {
       DELETE: `${stubsPath}/DELETE_200_OK.json`
     },
 
-    // See https://docs.postman-echo.com/?version=latest#083e46e7-53ea-87b1-8104-f8917ce58a17
+    // https://docs.postman-echo.com/?version=latest#083e46e7-53ea-87b1-8104-f8917ce58a17
     '/post': { POST: 'https://postman-echo.com' },
 
     '/multiple/verbs/delay': {

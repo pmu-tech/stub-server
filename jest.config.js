@@ -4,13 +4,14 @@
 const { defaults } = require('jest-config');
 /* eslint-enable @typescript-eslint/no-var-requires */
 
-module.exports = {
+/** @type Partial<import('@jest/types').Config.InitialOptions> */
+const config = {
   setupFiles: ['./jest.setup.ts'],
   coveragePathIgnorePatterns: [...defaults.coveragePathIgnorePatterns, './jest.setup.ts'],
 
   // By default Jest allows for __tests__/*.js, *.spec.js and *.test.js
-  // See https://jestjs.io/docs/en/configuration#testregex-string-array-string
-  // let's be strict and use *.test.js only
+  // https://jestjs.io/docs/en/configuration#testregex-string-array-string
+  // Let's be strict and use *.test.js only
   testRegex: '\\.test\\.tsx?$',
 
   coverageThreshold: {
@@ -22,3 +23,5 @@ module.exports = {
     }
   }
 };
+
+module.exports = config;

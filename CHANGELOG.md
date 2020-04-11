@@ -1,3 +1,8 @@
+## Next
+
+- Improve documentation
+- Update npm packages
+
 ## 0.3.0 (2020/03/16)
 
 - Switch to upper case HTTP verbs (still compatible with lower case HTTP verbs)
