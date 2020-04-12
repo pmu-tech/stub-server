@@ -1,4 +1,4 @@
-## Next
+## 0.3.1 (2020/04/12)
 
 - Improve documentation
 - Update npm packages
