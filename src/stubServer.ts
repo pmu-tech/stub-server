@@ -48,7 +48,7 @@ let _configPath: string;
 
 function getConfig() {
   deleteRequireCache(_configPath);
-  // eslint-disable-next-line import/no-dynamic-require, global-require
+  // eslint-disable-next-line import/no-dynamic-require, global-require, @typescript-eslint/no-var-requires
   return require(_configPath).default as StubServerConfig;
 }
 
@@ -104,6 +104,7 @@ async function processStubRequest(
   } else {
     const filename = stubName;
 
+    // eslint-disable-next-line @typescript-eslint/ban-types
     let fileContent: string | object | undefined;
 
     if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
