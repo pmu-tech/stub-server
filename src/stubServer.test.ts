@@ -185,6 +185,7 @@ describe('proxy', () => {
         'multipart/form-data; boundary=--------------------------579117600727930638952591',
       host: 'postman-echo.com',
       'user-agent': 'node-superagent/3.8.3',
+      'x-amzn-trace-id': 'Root=1-5f1b1e55-f46447b2ed92d3ab58eabb7b',
       'x-forwarded-port': '443',
       'x-forwarded-proto': 'https'
     },
@@ -291,6 +292,7 @@ describe('proxy', () => {
 
       const response = JSON.parse(JSON.stringify(POST_postman_echo_com_post)); // Deep copy
       response.headers['content-type'] = expect.any(String);
+      response.headers['x-amzn-trace-id'] = expect.any(String);
 
       const res = await request(app)
         .post('/post')

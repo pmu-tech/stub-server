@@ -1,3 +1,8 @@
+## Next
+
+- Update npm packages
+- Fix ESLint rules
+
 ## 0.3.1 (2020/04/12)
 
 - Improve documentation
