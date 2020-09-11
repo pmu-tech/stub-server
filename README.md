@@ -180,9 +180,7 @@ app.prepare().then(() => {
 
   server.all('*', (req, res) => handle(req, res));
 
-  server.listen(port, err => {
-    if (err) throw err;
-
+  server.listen(port, () => {
     // https://github.com/zeit/next.js/blob/v9.3.1/packages/next/build/output/store.ts#L85-L88
     Log.ready(`ready on port ${port}`);
   });
