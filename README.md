@@ -6,7 +6,7 @@
 [![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![Airbnb Code Style](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
 
-Stub server for REST APIs
+Stub/mock server for REST APIs
 
 For each route, decide what will happen: a JSON stub, a piece of JS or redirect to a real server
 
