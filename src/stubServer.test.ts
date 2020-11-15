@@ -14,6 +14,12 @@ beforeAll(() => {
   stubServer(configPath, app);
 });
 
+let consoleSpy: jest.SpyInstance;
+beforeEach(() => {
+  consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+});
+afterEach(() => consoleSpy.mockRestore());
+
 describe('files', () => {
   test('file without HTTP status', async () => {
     const res = await request(app).get('/get/json/noHttpStatus');
@@ -303,8 +309,6 @@ describe('proxy', () => {
 });
 
 test('delay', async () => {
-  const consoleSpy = jest.spyOn(console, 'log');
-
   let res = await request(app).get('/multiple/verbs/delay');
   expect(res.status).toEqual(200);
   expect(res.body).toEqual({ stub: 'GET_200_OK.json' });
@@ -334,8 +338,6 @@ test('delay', async () => {
       /^PUT \/multiple\/verbs\/delay => \/.*\/config-test\/PUT_200_OK\.json, delay: (4|5|6) ms$/
     )
   );
-
-  consoleSpy.mockRestore();
 });
 
 test('unknown route', async () => {
