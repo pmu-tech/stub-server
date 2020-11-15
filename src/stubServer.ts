@@ -36,7 +36,7 @@ const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 async function randomDelay(min: number, max: number) {
   // We could do better by allowing different number distributions
   // [Generate random number with a non-uniform distribution](https://stackoverflow.com/q/16110758)
-  // [Generate random number between two numbers in JavaScript](https://stackoverflow.com/a/7228322/990356)
+  // [Generate random number between two numbers in JavaScript](https://stackoverflow.com/a/7228322)
   const delay = Math.floor(Math.random() * (max - min + 1)) + min;
   await wait(delay);
   return delay;
