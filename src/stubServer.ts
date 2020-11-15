@@ -36,7 +36,7 @@ const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 async function randomDelay(min: number, max: number) {
   // We could do better by allowing different number distributions
   // [Generate random number with a non-uniform distribution](https://stackoverflow.com/q/16110758)
-  // [Generate random number between two numbers in JavaScript](https://stackoverflow.com/a/7228322/990356)
+  // [Generate random number between two numbers in JavaScript](https://stackoverflow.com/a/7228322)
   const delay = Math.floor(Math.random() * (max - min + 1)) + min;
   await wait(delay);
   return delay;
@@ -129,7 +129,7 @@ async function processStubRequest(
     }
 
     if (fileContent !== undefined) {
-      const match = /_(\d+)_[a-zA-Z]+/.exec(filename);
+      const match = /_(\d+)_[A-Za-z]+/.exec(filename);
       const httpStatus = match !== null ? Number(match![1]) : 200; // 200: default HTTP status if none specified
 
       if (httpStatus === 204 /* No Content */) {

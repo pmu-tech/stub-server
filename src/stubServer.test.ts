@@ -1,11 +1,11 @@
 import express from 'express';
-import { resolve } from 'path';
+import path from 'path';
 import request from 'supertest';
 
 import * as proxy from './proxy';
 import { stubServer } from './stubServer';
 
-const configPath = resolve(__dirname, 'config-test', 'config');
+const configPath = path.resolve(__dirname, 'config-test', 'config');
 
 let app: express.Express;
 
@@ -13,6 +13,12 @@ beforeAll(() => {
   app = express();
   stubServer(configPath, app);
 });
+
+let consoleSpy: jest.SpyInstance;
+beforeEach(() => {
+  consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+});
+afterEach(() => consoleSpy.mockRestore());
 
 describe('files', () => {
   test('file without HTTP status', async () => {
@@ -184,11 +190,11 @@ describe('proxy', () => {
       'content-type':
         'multipart/form-data; boundary=--------------------------579117600727930638952591',
       host: 'postman-echo.com',
-      'user-agent': 'node-superagent/3.8.3',
       'x-amzn-trace-id': 'Root=1-5f1b1e55-f46447b2ed92d3ab58eabb7b',
       'x-forwarded-port': '443',
       'x-forwarded-proto': 'https'
     },
+    // eslint-disable-next-line unicorn/no-null
     json: null,
     url: 'https://postman-echo.com/post'
   };
@@ -304,8 +310,6 @@ describe('proxy', () => {
 });
 
 test('delay', async () => {
-  const consoleSpy = jest.spyOn(console, 'log');
-
   let res = await request(app).get('/multiple/verbs/delay');
   expect(res.status).toEqual(200);
   expect(res.body).toEqual({ stub: 'GET_200_OK.json' });
@@ -332,11 +336,9 @@ test('delay', async () => {
   expect(consoleSpy).toHaveBeenCalledTimes(3);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^PUT \/multiple\/verbs\/delay => \/.*\/config-test\/PUT_200_OK\.json, delay: (4|5|6) ms$/
+      /^PUT \/multiple\/verbs\/delay => \/.*\/config-test\/PUT_200_OK\.json, delay: ([4-6]) ms$/
     )
   );
-
-  consoleSpy.mockRestore();
 });
 
 test('unknown route', async () => {
