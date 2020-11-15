@@ -2,9 +2,9 @@
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-const { resolve } = require('path');
+const path = require('path');
 
-const stubsPath = resolve(__dirname, '../src/config-test');
+const stubsPath = path.resolve(__dirname, '../src/config-test');
 
 exports.default = {
   routes: {

@@ -6,7 +6,7 @@
 
 const cmd = require('commander');
 const express = require('express');
-const { resolve } = require('path');
+const path = require('path');
 
 const { stubServer } = require('../dist/cjs/stubServer');
 
@@ -18,14 +18,14 @@ cmd.parse(process.argv);
 
 // https://en.wikipedia.org/wiki/ANSI_escape_code
 const ESC = {
-  Reset: '\x1b[0m',
-  Bold: '\x1b[1m',
-  Blue: '\x1b[34m'
+  Reset: '\u001B[0m',
+  Bold: '\u001B[1m',
+  Blue: '\u001B[34m'
 };
 /** @param {string} text */
 const emphasize = text => `${ESC.Bold}${ESC.Blue}${text}${ESC.Reset}`;
 
-const config = resolve(cmd.config);
+const config = path.resolve(cmd.config);
 const host = 'localhost';
 const port = Number(cmd.port);
 

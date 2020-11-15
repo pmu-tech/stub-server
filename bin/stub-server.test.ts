@@ -12,6 +12,7 @@ const correctPort = '16928';
 const EXIT_SUCCESS = 0;
 const EXIT_FAILURE = 1;
 
+// eslint-disable-next-line unicorn/no-null
 const EXIT_SIGTERM = null;
 
 const killStubServerAfterRunning = (process: ChildProcessWithoutNullStreams) =>
@@ -20,7 +21,7 @@ const killStubServerAfterRunning = (process: ChildProcessWithoutNullStreams) =>
 // [Remove all ANSI colors/styles from strings](https://stackoverflow.com/q/25245716)
 const cleanAnsi = (str: string) =>
   // eslint-disable-next-line no-control-regex
-  str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
+  str.replace(/[\u001B\u009B][#();?[]*(?:\d{1,4}(?:;\d{0,4})*)?[\d<=>A-ORZcf-nqry]/g, '');
 
 // eslint-disable-next-line jest/no-done-callback
 test('correct config param', done => {

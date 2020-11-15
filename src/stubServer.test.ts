@@ -1,11 +1,11 @@
 import express from 'express';
-import { resolve } from 'path';
+import path from 'path';
 import request from 'supertest';
 
 import * as proxy from './proxy';
 import { stubServer } from './stubServer';
 
-const configPath = resolve(__dirname, 'config-test', 'config');
+const configPath = path.resolve(__dirname, 'config-test', 'config');
 
 let app: express.Express;
 
@@ -194,6 +194,7 @@ describe('proxy', () => {
       'x-forwarded-port': '443',
       'x-forwarded-proto': 'https'
     },
+    // eslint-disable-next-line unicorn/no-null
     json: null,
     url: 'https://postman-echo.com/post'
   };
@@ -335,7 +336,7 @@ test('delay', async () => {
   expect(consoleSpy).toHaveBeenCalledTimes(3);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^PUT \/multiple\/verbs\/delay => \/.*\/config-test\/PUT_200_OK\.json, delay: (4|5|6) ms$/
+      /^PUT \/multiple\/verbs\/delay => \/.*\/config-test\/PUT_200_OK\.json, delay: ([4-6]) ms$/
     )
   );
 });

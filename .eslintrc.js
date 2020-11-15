@@ -6,6 +6,7 @@ const config = {
   parserOptions: {},
   extends: [
     // /!\ Order matters: the next one overrides rules from the previous one
+    'plugin:unicorn/recommended',
     'plugin:jest/recommended',
     'airbnb-base',
     'plugin:@typescript-eslint/recommended',
@@ -18,6 +19,7 @@ const config = {
   rules: {
     'no-console': 'off',
     'no-underscore-dangle': 'off',
+    'spaced-comment': 'off',
     camelcase: 'off',
 
     'import/no-extraneous-dependencies': 'off',
@@ -74,6 +76,9 @@ const config = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+
+    'unicorn/filename-case': 'off',
+    'unicorn/prevent-abbreviations': 'off',
 
     'jest/no-expect-resolves': 'error'
   }

@@ -1,6 +1,7 @@
 ## Next
 
 - Update npm packages
+- Use eslint-plugin-unicorn
 
 ## 0.3.2 (2020/08/11)
 
