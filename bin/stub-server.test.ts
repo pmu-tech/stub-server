@@ -22,7 +22,7 @@ const cleanAnsi = (str: string) =>
   // eslint-disable-next-line no-control-regex
   str.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 
-// eslint-disable-next-line jest/no-test-callback
+// eslint-disable-next-line jest/no-done-callback
 test('correct config param', done => {
   expect.assertions(2);
 
@@ -43,7 +43,7 @@ test('correct config param', done => {
   killStubServerAfterRunning(process);
 });
 
-// eslint-disable-next-line jest/no-test-callback
+// eslint-disable-next-line jest/no-done-callback
 test('correct config and port params', done => {
   expect.assertions(2);
 
@@ -64,7 +64,7 @@ test('correct config and port params', done => {
   killStubServerAfterRunning(process);
 });
 
-// eslint-disable-next-line jest/no-test-callback
+// eslint-disable-next-line jest/no-done-callback
 test('network request', done => {
   // Unfortunately it does not test CORS because the request is performed server side :-/
   // Users perform requests in a web browser where CORS is enabled
@@ -81,8 +81,10 @@ test('network request', done => {
         });
 
         res.on('close', () => {
+          /* eslint-disable jest/no-conditional-expect */
           expect(res.statusCode).toEqual(200);
           expect(JSON.parse(resData)).toEqual({ stub: 'GET_200_OK.json' });
+          /* eslint-enable jest/no-conditional-expect */
 
           process.kill();
         });
@@ -98,7 +100,7 @@ test('network request', done => {
   });
 });
 
-// eslint-disable-next-line jest/no-test-callback
+// eslint-disable-next-line jest/no-done-callback
 test('incorrect config param', done => {
   expect.assertions(2);
 
@@ -115,7 +117,7 @@ test('incorrect config param', done => {
   });
 });
 
-// eslint-disable-next-line jest/no-test-callback
+// eslint-disable-next-line jest/no-done-callback
 test('incorrect port param', done => {
   expect.assertions(2);
 

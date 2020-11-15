@@ -184,7 +184,6 @@ describe('proxy', () => {
       'content-type':
         'multipart/form-data; boundary=--------------------------579117600727930638952591',
       host: 'postman-echo.com',
-      'user-agent': 'node-superagent/3.8.3',
       'x-amzn-trace-id': 'Root=1-5f1b1e55-f46447b2ed92d3ab58eabb7b',
       'x-forwarded-port': '443',
       'x-forwarded-proto': 'https'
