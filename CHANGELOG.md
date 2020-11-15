@@ -1,4 +1,4 @@
-## Next
+## 0.3.3 (2020/11/15)
 
 - Update npm packages
 - Use eslint-plugin-unicorn
