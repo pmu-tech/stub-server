@@ -377,7 +377,7 @@ describe('express request handler', () => {
     });
 
     // eslint-disable-next-line jest/expect-expect
-    test('do nothing"', async () => {
+    test('do nothing', async () => {
       // Timeout - Async callback was not invoked within the 5000ms timeout specified by jest.setTimeout.Timeout
       // await request(app).get('/get/express/ts/doNothing');
     });
