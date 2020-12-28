@@ -1,4 +1,4 @@
-## Next
+## 0.3.4 (2020/12/28)
 
 - Update npm packages
 
