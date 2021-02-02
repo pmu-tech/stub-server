@@ -1,5 +1,7 @@
 // @ts-check
 
+// TODO Rename to eslint.config.js when supported: https://github.com/eslint/eslint/issues/11844
+
 /** @type {import('eslint').Linter.Config} */
 const config = {
   parser: '@typescript-eslint/parser',
