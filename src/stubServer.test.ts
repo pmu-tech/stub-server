@@ -341,6 +341,53 @@ test('delay', async () => {
   );
 });
 
+test('HTTP headers', async () => {
+  let res = await request(app).get('/root/headers');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({
+    headers: {
+      'accept-encoding': 'gzip, deflate',
+      connection: 'close',
+      host: expect.any(String)
+    }
+  });
+
+  res = await request(app).get('/multiple/verbs/headers');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({
+    headers: {
+      'accept-encoding': 'gzip, deflate',
+      connection: 'close',
+      host: expect.any(String),
+      origin: 'http://routeHeaders.com'
+    }
+  });
+
+  res = await request(app).post('/multiple/verbs/headers');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({
+    headers: {
+      'accept-encoding': 'gzip, deflate',
+      connection: 'close',
+      'content-length': '0',
+      host: expect.any(String),
+      origin: 'http://POST.com'
+    }
+  });
+
+  res = await request(app).put('/multiple/verbs/headers');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({
+    headers: {
+      'accept-encoding': 'gzip, deflate',
+      connection: 'close',
+      'content-length': '0',
+      host: expect.any(String),
+      origin: 'http://PUT.com'
+    }
+  });
+});
+
 test('unknown route', async () => {
   const res = await request(app).get('/get/unknownRoute');
   expect(res.status).toEqual(404);

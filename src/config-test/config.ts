@@ -58,6 +58,22 @@ const config: StubServerConfig = {
       }
     },
 
+    '/root/headers': {
+      GET: `${stubsPath}/readHttpHeaders.ts`
+    },
+    '/multiple/verbs/headers': {
+      headers: { origin: 'http://routeHeaders.com' },
+      GET: `${stubsPath}/readHttpHeaders.ts`,
+      POST: {
+        response: `${stubsPath}/readHttpHeaders.ts`,
+        headers: { origin: 'http://POST.com' }
+      },
+      PUT: {
+        response: `${stubsPath}/readHttpHeaders.ts`,
+        headers: { origin: 'http://PUT.com' }
+      }
+    },
+
     '/get/express/ts/:param?': { GET: `${stubsPath}/GET_express.ts` },
     '/get/express/js/:param?': { GET: `${stubsPath}/GET_express.js` },
 
