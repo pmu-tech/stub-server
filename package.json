@@ -39,6 +39,7 @@
     "precommit": "npm run format && npm run lint",
     "prepush": "npm run test",
     "prepublishOnly": "npm run build",
+    "publish:beta": "npm version 0.4.0-beta.1 && npm publish --tag next",
     "npm:update": "npm run clean:all && npx npm-check-updates --upgrade && npm install"
   },
   "peerDependencies": {
