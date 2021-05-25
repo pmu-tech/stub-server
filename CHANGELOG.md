@@ -1,3 +1,8 @@
+## 0.4.0 (2021/05/25)
+
+- New option to customize HTTP headers
+- Update npm packages
+
 ## 0.3.4 (2020/12/28)
 
 - Update npm packages
