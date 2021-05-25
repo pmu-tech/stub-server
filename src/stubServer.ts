@@ -1,5 +1,6 @@
 import express from 'express';
 import fs from 'fs';
+import { IncomingHttpHeaders } from 'http';
 
 import { send } from './proxy';
 
@@ -13,13 +14,14 @@ type Stub = URL | StubFilename | GetStubFilenameFunction;
 type Delay = { min: number; max: number };
 
 type Response = {
-  [httpVerb in HTTPVerb]?: Stub | { response: Stub; delay?: Delay };
+  [httpVerb in HTTPVerb]?: Stub | { response: Stub; delay?: Delay; headers?: IncomingHttpHeaders };
 };
 
-type Route = { delay?: Delay } & Response;
+type Route = { delay?: Delay } & { headers?: IncomingHttpHeaders } & Response;
 
 export interface StubServerConfig {
   delay?: Delay;
+  headers?: IncomingHttpHeaders;
   routes: {
     [apiPath: string]: Route;
   };
@@ -31,7 +33,7 @@ function deleteRequireCache(module: string) {
   delete require.cache[require.resolve(module)];
 }
 
-const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const wait = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 async function randomDelay(min: number, max: number) {
   // We could do better by allowing different number distributions
@@ -56,11 +58,13 @@ async function parseConfig(apiPath: string, req: express.Request) {
   // Re-read the config file for each new request so the user
   // don't have to restart the stub server
   // except if he adds a new route which is acceptable
-  const { delay: globalDelay, routes } = getConfig();
+  const { delay: globalDelay, routes, headers: globalHeaders } = getConfig();
 
   const route = routes[apiPath];
 
-  const { delay: routeDelay, ...responses } = route;
+  const { delay: routeDelay, headers: routeHeaders, ...responses } = route;
+
+  req.headers = { ...req.headers, ...globalHeaders, ...routeHeaders };
 
   const httpVerb = req.method as HTTPVerb;
   const stub =
@@ -78,6 +82,7 @@ async function parseConfig(apiPath: string, req: express.Request) {
   } else {
     name = typeof stub.response === 'function' ? stub.response(req) : stub.response;
     delay = stub.delay;
+    req.headers = { ...req.headers, ...stub.headers };
   }
 
   // Delay the request to simulate network latency
@@ -153,7 +158,7 @@ export function stubServer(configPath: string, app: express.Application) {
 
   Object.entries(routes).forEach(([apiPath, route]) => {
     Object.keys(route).forEach(httpVerb => {
-      if (httpVerb !== 'delay') {
+      if (httpVerb !== 'delay' && httpVerb !== 'headers') {
         // If invalid HTTP verb, crash with "TypeError: app[httpVerb] is not a function"
         app[httpVerb.toLowerCase() as ExpressRoute](apiPath, (req, res, next) =>
           processStubRequest(apiPath, req, res, next)

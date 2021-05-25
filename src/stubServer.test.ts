@@ -172,8 +172,7 @@ describe('proxy', () => {
     userId: 1,
     id: 1,
     title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
-    body:
-      'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+    body: 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
   };
 
   const POST_postman_echo_com_post = {
@@ -339,6 +338,53 @@ test('delay', async () => {
       /^PUT \/multiple\/verbs\/delay => \/.*\/config-test\/PUT_200_OK\.json, delay: ([4-6]) ms$/
     )
   );
+});
+
+test('HTTP headers', async () => {
+  let res = await request(app).get('/root/headers');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({
+    headers: {
+      'accept-encoding': 'gzip, deflate',
+      connection: 'close',
+      host: expect.any(String)
+    }
+  });
+
+  res = await request(app).get('/multiple/verbs/headers');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({
+    headers: {
+      'accept-encoding': 'gzip, deflate',
+      connection: 'close',
+      host: expect.any(String),
+      origin: 'http://routeHeaders.com'
+    }
+  });
+
+  res = await request(app).post('/multiple/verbs/headers');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({
+    headers: {
+      'accept-encoding': 'gzip, deflate',
+      connection: 'close',
+      'content-length': '0',
+      host: expect.any(String),
+      origin: 'http://POST.com'
+    }
+  });
+
+  res = await request(app).put('/multiple/verbs/headers');
+  expect(res.status).toEqual(200);
+  expect(res.body).toEqual({
+    headers: {
+      'accept-encoding': 'gzip, deflate',
+      connection: 'close',
+      'content-length': '0',
+      host: expect.any(String),
+      origin: 'http://PUT.com'
+    }
+  });
 });
 
 test('unknown route', async () => {

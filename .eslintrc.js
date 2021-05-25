@@ -12,8 +12,7 @@ const config = {
     'plugin:jest/recommended',
     'airbnb-base',
     'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-    'prettier/@typescript-eslint'
+    'plugin:prettier/recommended'
   ],
   plugins: ['simple-import-sort'],
   env: {},
@@ -78,6 +77,15 @@ const config = {
 
     'unicorn/filename-case': 'off',
     'unicorn/prevent-abbreviations': 'off',
+    // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v27.0.0/docs/rules/no-array-for-each.md
+    // https://github.com/github/eslint-plugin-github/blob/v4.1.1/docs/rules/array-foreach.md
+    // conflicts with
+    // https://github.com/airbnb/javascript/issues/1271
+    'unicorn/no-array-for-each': 'off',
+    // FIXME Activate when ES modules are well supported
+    'unicorn/prefer-module': 'off',
+    // FIXME Activate when ES modules are well supported
+    'unicorn/prefer-node-protocol': 'off',
 
     'jest/no-expect-resolves': 'error'
   }
