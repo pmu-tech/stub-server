@@ -203,7 +203,7 @@ app.prepare().then(() => {
 
 ### Prerequisites
 
-- Node.js >= 10
+- Node.js >= 12
 - VSCode extensions: "EditorConfig for VS Code" and "Prettier - Code formatter"
 
 ### Build
