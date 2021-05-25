@@ -16,6 +16,7 @@ For each route, decide what will happen: a JSON stub, a piece of JS or redirect 
 - No need to restart stub-server if you modify a stub
 - The HTTP status code returned is determined from the stub filename: \*\_200\_\*.json, \*\_500\_\*.html...
 - Configurable delays to simulate slow APIs
+- Configurable HTTP headers (useful to change origin and bypass CORS for some APIs)
 
 ## Usage
 
@@ -63,6 +64,7 @@ const config: StubServerConfig = {
       GET: `${stubsPath}/my_api7_GET_200_OK.json`,
       POST: {
         delay: { min: 0, max: 0 },
+        headers: { origin: 'https://pmu.fr' },
         response: `${stubsPath}/my_api7_POST_200_OK.json`
       }
     },
