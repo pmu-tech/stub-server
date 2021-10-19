@@ -1,3 +1,9 @@
+## Next
+
+- Improve documentation
+- Better error handling (#31)
+- Update npm packages
+
 ## 0.4.0 (2021/05/25)
 
 - New option to customize HTTP headers
