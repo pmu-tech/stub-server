@@ -69,9 +69,12 @@ async function parseConfig(apiPath: string, req: express.Request) {
 
   const requestMethod = req.method as RequestMethod;
   const stub =
-    responses[requestMethod]! ??
+    responses[requestMethod] ??
     // Compatibility with lower case HTTP request methods
     responses[requestMethod.toLowerCase() as RequestMethod];
+  if (stub === undefined) {
+    throw new Error(`No route for '${requestMethod}' HTTP request method`);
+  }
 
   let name: URL | StubFilename;
   let delay: Delay | undefined;
@@ -161,11 +164,11 @@ export function stubServer(configPath: string, app: express.Application) {
   Object.entries(routes).forEach(([apiPath, route]) => {
     Object.keys(route).forEach(requestMethod => {
       if (requestMethod !== 'delay' && requestMethod !== 'headers') {
-        // If config.ts contains an invalid HTTP request method,
-        // crashes with: "TypeError: app[method] is not a function"
-        app[requestMethod.toLowerCase() as ExpressMethod](apiPath, (req, res, next) =>
-          processStubRequest(apiPath, req, res, next)
-        );
+        const method = requestMethod.toLowerCase() as ExpressMethod;
+        if (app[method] === undefined) {
+          throw new Error(`Invalid HTTP request method: '${method}'`);
+        }
+        app[method](apiPath, (req, res, next) => processStubRequest(apiPath, req, res, next));
       }
     });
   });

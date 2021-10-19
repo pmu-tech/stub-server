@@ -103,9 +103,15 @@ describe('HTTP status codes', () => {
 
 describe('HTTP request methods', () => {
   // eslint-disable-next-line jest/expect-expect
-  test('invalid HTTP request method', () => {
+  test('invalid HTTP request method', async () => {
     // If config.ts contains an invalid HTTP request method,
-    // then stubServer.ts crashes with: "TypeError: app[method] is not a function"
+    // stubServer.ts throws "Invalid HTTP request method: 'foobar'"
+  });
+
+  // eslint-disable-next-line jest/expect-expect
+  test('HEAD', async () => {
+    // await request(app).head('/get/json');
+    // Throws "No route for 'HEAD' HTTP request method"
   });
 
   test('GET', async () => {
