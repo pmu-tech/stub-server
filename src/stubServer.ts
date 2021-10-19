@@ -13,19 +13,19 @@ type Stub = URL | StubFilename | GetStubFilenameFunction;
 
 type Delay = { min: number; max: number };
 
+type CommonConfig = { delay?: Delay; headers?: IncomingHttpHeaders };
+
 type Response = {
-  [httpVerb in HTTPVerb]?: Stub | { response: Stub; delay?: Delay; headers?: IncomingHttpHeaders };
+  [httpVerb in HTTPVerb]?: Stub | (CommonConfig & { response: Stub });
 };
 
-type Route = { delay?: Delay } & { headers?: IncomingHttpHeaders } & Response;
+type Route = CommonConfig & Response;
 
-export interface StubServerConfig {
-  delay?: Delay;
-  headers?: IncomingHttpHeaders;
+export type StubServerConfig = CommonConfig & {
   routes: {
     [apiPath: string]: Route;
   };
-}
+};
 
 // Allows to modify the imported files without restarting the server
 // [node.js require() cache - possible to invalidate?](https://stackoverflow.com/a/16060619)
