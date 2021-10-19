@@ -101,11 +101,11 @@ describe('HTTP status codes', () => {
   });
 });
 
-describe('HTTP verbs', () => {
+describe('HTTP request methods', () => {
   // eslint-disable-next-line jest/expect-expect
-  test('unknown HTTP verb', () => {
-    // If config.ts contains an invalid HTTP verb, then stubServer.ts crashes with:
-    // TypeError: app[method] is not a function
+  test('invalid HTTP request method', () => {
+    // If config.ts contains an invalid HTTP request method,
+    // then stubServer.ts crashes with: "TypeError: app[method] is not a function"
   });
 
   test('GET', async () => {
@@ -144,24 +144,24 @@ describe('HTTP verbs', () => {
     expect(res.body).toEqual({ stub: 'DELETE_200_OK.json' });
   });
 
-  test('multiple verbs', async () => {
-    let res = await request(app).get('/multiple/verbs');
+  test('multiple HTTP request methods', async () => {
+    let res = await request(app).get('/multiple/methods');
     expect(res.status).toEqual(200);
     expect(res.body).toEqual({ stub: 'GET_200_OK.json' });
 
-    res = await request(app).post('/multiple/verbs');
+    res = await request(app).post('/multiple/methods');
     expect(res.status).toEqual(200);
     expect(res.body).toEqual({ stub: 'POST_200_OK.json' });
 
-    res = await request(app).put('/multiple/verbs');
+    res = await request(app).put('/multiple/methods');
     expect(res.status).toEqual(200);
     expect(res.body).toEqual({ stub: 'PUT_200_OK.json' });
 
-    res = await request(app).patch('/multiple/verbs');
+    res = await request(app).patch('/multiple/methods');
     expect(res.status).toEqual(200);
     expect(res.body).toEqual({ stub: 'PATCH_200_OK.json' });
 
-    res = await request(app).delete('/multiple/verbs');
+    res = await request(app).delete('/multiple/methods');
     expect(res.status).toEqual(200);
     expect(res.body).toEqual({ stub: 'DELETE_200_OK.json' });
   });
@@ -309,33 +309,33 @@ describe('proxy', () => {
 });
 
 test('delay', async () => {
-  let res = await request(app).get('/multiple/verbs/delay');
+  let res = await request(app).get('/multiple/methods/delay');
   expect(res.status).toEqual(200);
   expect(res.body).toEqual({ stub: 'GET_200_OK.json' });
   expect(consoleSpy).toHaveBeenCalledTimes(1);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^GET \/multiple\/verbs\/delay => \/.*\/config-test\/GET_200_OK\.json, delay: (2|3) ms$/
+      /^GET \/multiple\/methods\/delay => \/.*\/config-test\/GET_200_OK\.json, delay: (2|3) ms$/
     )
   );
 
-  res = await request(app).post('/multiple/verbs/delay');
+  res = await request(app).post('/multiple/methods/delay');
   expect(res.status).toEqual(200);
   expect(res.body).toEqual({ stub: 'POST_200_OK.json' });
   expect(consoleSpy).toHaveBeenCalledTimes(2);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^POST \/multiple\/verbs\/delay => \/.*\/config-test\/POST_200_OK\.json, delay: (4|5) ms$/
+      /^POST \/multiple\/methods\/delay => \/.*\/config-test\/POST_200_OK\.json, delay: (4|5) ms$/
     )
   );
 
-  res = await request(app).put('/multiple/verbs/delay');
+  res = await request(app).put('/multiple/methods/delay');
   expect(res.status).toEqual(200);
   expect(res.body).toEqual({ stub: 'PUT_200_OK.json' });
   expect(consoleSpy).toHaveBeenCalledTimes(3);
   expect(consoleSpy).toHaveBeenLastCalledWith(
     expect.stringMatching(
-      /^PUT \/multiple\/verbs\/delay => \/.*\/config-test\/PUT_200_OK\.json, delay: ([4-6]) ms$/
+      /^PUT \/multiple\/methods\/delay => \/.*\/config-test\/PUT_200_OK\.json, delay: ([4-6]) ms$/
     )
   );
 });
@@ -351,7 +351,7 @@ test('HTTP headers', async () => {
     }
   });
 
-  res = await request(app).get('/multiple/verbs/headers');
+  res = await request(app).get('/multiple/methods/headers');
   expect(res.status).toEqual(200);
   expect(res.body).toEqual({
     headers: {
@@ -362,7 +362,7 @@ test('HTTP headers', async () => {
     }
   });
 
-  res = await request(app).post('/multiple/verbs/headers');
+  res = await request(app).post('/multiple/methods/headers');
   expect(res.status).toEqual(200);
   expect(res.body).toEqual({
     headers: {
@@ -374,7 +374,7 @@ test('HTTP headers', async () => {
     }
   });
 
-  res = await request(app).put('/multiple/verbs/headers');
+  res = await request(app).put('/multiple/methods/headers');
   expect(res.status).toEqual(200);
   expect(res.body).toEqual({
     headers: {

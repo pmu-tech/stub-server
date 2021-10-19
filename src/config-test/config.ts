@@ -34,7 +34,7 @@ const config: StubServerConfig = {
     '/posts/:id': { GET: 'https://jsonplaceholder.typicode.com' },
     '/unknownHost': { GET: 'http://unknown_host.com/' },
 
-    '/multiple/verbs': {
+    '/multiple/methods': {
       GET: `${stubsPath}/GET_200_OK.json`,
       POST: `${stubsPath}/POST_200_OK.json`,
       PUT: `${stubsPath}/PUT_200_OK.json`,
@@ -45,7 +45,7 @@ const config: StubServerConfig = {
     // https://docs.postman-echo.com/?version=latest#083e46e7-53ea-87b1-8104-f8917ce58a17
     '/post': { POST: 'https://postman-echo.com' },
 
-    '/multiple/verbs/delay': {
+    '/multiple/methods/delay': {
       delay: { min: 2, max: 3 },
       GET: `${stubsPath}/GET_200_OK.json`,
       POST: {
@@ -61,7 +61,7 @@ const config: StubServerConfig = {
     '/root/headers': {
       GET: `${stubsPath}/readHttpHeaders.ts`
     },
-    '/multiple/verbs/headers': {
+    '/multiple/methods/headers': {
       headers: { origin: 'http://routeHeaders.com' },
       GET: `${stubsPath}/readHttpHeaders.ts`,
       POST: {
