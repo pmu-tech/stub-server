@@ -10,7 +10,7 @@ Stub/mock server for REST APIs
 
 For each route, decide what will happen: a JSON stub, a piece of JS or redirect to a real server
 
-- Use it with Express, [webpack-dev-server](https://github.com/webpack/webpack-dev-server) or the command line
+- Use it with Express, [webpack-dev-server](https://github.com/webpack/webpack-dev-server), Next.js or the command line
 - Support stubs written in JSON, JS, TypeScript, HTML, jpg...
 - Can redirect requests to another host thx to [node-http-proxy](https://github.com/http-party/node-http-proxy)
 - No need to restart stub-server if you modify a stub
@@ -92,6 +92,13 @@ import { stubServer } from '@pmu-tech/stub-server';
   devServer: {
     // ...
 
+    // webpack 5
+    onBeforeSetupMiddleware: ({ app }) => {
+      const configPath = path.resolve(__dirname, 'stubs', 'config');
+      stubServer(configPath, app);
+    }
+
+    // webpack 4
     before: app => {
       const configPath = path.resolve(__dirname, 'stubs', 'config');
       stubServer(configPath, app);
@@ -145,7 +152,7 @@ module.exports = (req, res) => {
 };
 ```
 
-### Command line
+## Command line
 
 ```
 Usage: stub-server [options]
@@ -159,24 +166,25 @@ Options:
 ## Next.js
 
 ```JavaScript
-// server.js
+// stubServer.js
 
-const { resolve } = require('path');
+const { stubServer } = require('@pmu-tech/stub-server');
+const cors = require('cors');
 const express = require('express');
 const next = require('next');
 const Log = require('next/dist/build/output/log');
-const { stubServer } = require('@pmu-tech/stub-server');
+const path = require('path');
 
-const port = 3000;
-
-const configPath = resolve(__dirname, 'stubs', 'config');
-
-const dev = process.env.NODE_ENV !== 'production';
-const app = next({ dev });
+const app = next({ dev: process.env.NODE_ENV !== 'production' });
 const handle = app.getRequestHandler();
+
+const configPath = path.resolve(__dirname, 'stubs', 'config');
+const port = 3000;
 
 app.prepare().then(() => {
   const server = express();
+  server.use(express.json());
+  server.use(cors());
 
   stubServer(configPath, server);
 
@@ -194,7 +202,7 @@ app.prepare().then(() => {
 
 {
   "scripts": {
-    "dev": "node server.js", // Instead of "next dev"
+    "dev": "node stubServer.js", // Instead of "next dev"
     "build": "next build",
     "start": "next start"
   }
