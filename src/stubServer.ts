@@ -72,10 +72,7 @@ async function parseConfig(apiPath: string, req: express.Request) {
   req.headers = { ...req.headers, ...globalHeaders, ...routeHeaders };
 
   const requestMethod = req.method as RequestMethod;
-  const stub =
-    responses[requestMethod] ??
-    // Compatibility with lower case HTTP request methods
-    responses[requestMethod.toLowerCase() as RequestMethod];
+  const stub = responses[requestMethod];
 
   // istanbul ignore next
   if (stub === undefined) {
