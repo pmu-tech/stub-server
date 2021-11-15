@@ -1,4 +1,4 @@
-## Next
+## 0.4.1 (2021/11/15)
 
 - Improve documentation
 - Better error handling (#31)
