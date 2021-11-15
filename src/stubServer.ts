@@ -34,7 +34,11 @@ function deleteRequireCache(module: string) {
   delete require.cache[require.resolve(module)];
 }
 
-const wait = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+function wait(ms: number) {
+  return new Promise<void>(resolve => {
+    setTimeout(resolve, ms);
+  });
+}
 
 async function randomDelay(min: number, max: number) {
   // We could do better by allowing different number distributions
