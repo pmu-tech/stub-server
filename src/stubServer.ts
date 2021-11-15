@@ -4,7 +4,8 @@ import { IncomingHttpHeaders } from 'http';
 
 import { send } from './proxy';
 
-type HTTPVerb = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+// https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods
+type RequestMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 type URL = string;
 type StubFilename = string;
@@ -13,19 +14,19 @@ type Stub = URL | StubFilename | GetStubFilenameFunction;
 
 type Delay = { min: number; max: number };
 
+type CommonConfig = { delay?: Delay; headers?: IncomingHttpHeaders };
+
 type Response = {
-  [httpVerb in HTTPVerb]?: Stub | { response: Stub; delay?: Delay; headers?: IncomingHttpHeaders };
+  [requestMethod in RequestMethod]?: Stub | (CommonConfig & { response: Stub });
 };
 
-type Route = { delay?: Delay } & { headers?: IncomingHttpHeaders } & Response;
+type Route = CommonConfig & Response;
 
-export interface StubServerConfig {
-  delay?: Delay;
-  headers?: IncomingHttpHeaders;
+export type StubServerConfig = CommonConfig & {
   routes: {
     [apiPath: string]: Route;
   };
-}
+};
 
 // Allows to modify the imported files without restarting the server
 // [node.js require() cache - possible to invalidate?](https://stackoverflow.com/a/16060619)
@@ -66,11 +67,16 @@ async function parseConfig(apiPath: string, req: express.Request) {
 
   req.headers = { ...req.headers, ...globalHeaders, ...routeHeaders };
 
-  const httpVerb = req.method as HTTPVerb;
+  const requestMethod = req.method as RequestMethod;
   const stub =
-    responses[httpVerb]! ??
-    // Compatibility with lower case HTTP verbs
-    responses[httpVerb.toLowerCase() as HTTPVerb];
+    responses[requestMethod] ??
+    // Compatibility with lower case HTTP request methods
+    responses[requestMethod.toLowerCase() as RequestMethod];
+
+  // istanbul ignore next
+  if (stub === undefined) {
+    throw new Error(`No route for '${requestMethod}' HTTP request method`);
+  }
 
   let name: URL | StubFilename;
   let delay: Delay | undefined;
@@ -90,7 +96,7 @@ async function parseConfig(apiPath: string, req: express.Request) {
   const { min, max } = delay ?? routeDelay ?? globalDelay ?? { min: 0, max: 0 };
   const actualDelay = await randomDelay(min, max);
 
-  console.log(`${httpVerb} ${req.url} => ${name}, delay: ${actualDelay} ms`);
+  console.log(`${requestMethod} ${req.url} => ${name}, delay: ${actualDelay} ms`);
 
   return name;
 }
@@ -146,7 +152,8 @@ async function processStubRequest(
   }
 }
 
-type ExpressRoute = 'get' | 'post' | 'put' | 'patch' | 'delete';
+// https://expressjs.com/en/4x/api.html#router.METHOD
+type ExpressMethod = 'get' | 'post' | 'put' | 'patch' | 'delete' | 'options' | 'head';
 
 export function stubServer(configPath: string, app: express.Application) {
   // Do not use asynchronous code here otherwise routes will
@@ -157,12 +164,16 @@ export function stubServer(configPath: string, app: express.Application) {
   const { routes } = getConfig();
 
   Object.entries(routes).forEach(([apiPath, route]) => {
-    Object.keys(route).forEach(httpVerb => {
-      if (httpVerb !== 'delay' && httpVerb !== 'headers') {
-        // If invalid HTTP verb, crash with "TypeError: app[httpVerb] is not a function"
-        app[httpVerb.toLowerCase() as ExpressRoute](apiPath, (req, res, next) =>
-          processStubRequest(apiPath, req, res, next)
-        );
+    Object.keys(route).forEach(requestMethod => {
+      if (requestMethod !== 'delay' && requestMethod !== 'headers') {
+        const method = requestMethod.toLowerCase() as ExpressMethod;
+
+        // istanbul ignore next
+        if (app[method] === undefined) {
+          throw new Error(`Invalid HTTP request method: '${method}'`);
+        }
+
+        app[method](apiPath, (req, res, next) => processStubRequest(apiPath, req, res, next));
       }
     });
   });
