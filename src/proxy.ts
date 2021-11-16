@@ -1,6 +1,8 @@
 import express from 'express';
 import { createProxyServer } from 'http-proxy';
 
+import { fixRequestBody } from './fixRequestBody';
+
 const send = (
   target: string,
   req: express.Request,
@@ -23,6 +25,7 @@ const send = (
     cookieDomainRewrite: req.hostname
   });
 
+  proxy.on('proxyReq', fixRequestBody);
   proxy.web(req, res, { target }, next);
 };
 
