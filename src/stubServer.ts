@@ -34,7 +34,11 @@ function deleteRequireCache(module: string) {
   delete require.cache[require.resolve(module)];
 }
 
-const wait = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+function wait(ms: number) {
+  return new Promise<void>(resolve => {
+    setTimeout(resolve, ms);
+  });
+}
 
 async function randomDelay(min: number, max: number) {
   // We could do better by allowing different number distributions
@@ -68,10 +72,7 @@ async function parseConfig(apiPath: string, req: express.Request) {
   req.headers = { ...req.headers, ...globalHeaders, ...routeHeaders };
 
   const requestMethod = req.method as RequestMethod;
-  const stub =
-    responses[requestMethod] ??
-    // Compatibility with lower case HTTP request methods
-    responses[requestMethod.toLowerCase() as RequestMethod];
+  const stub = responses[requestMethod];
 
   // istanbul ignore next
   if (stub === undefined) {

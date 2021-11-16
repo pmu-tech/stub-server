@@ -120,12 +120,6 @@ describe('HTTP request methods', () => {
     expect(res.body).toEqual({ stub: 'GET_200_OK.json' });
   });
 
-  test('compatibility with lower case', async () => {
-    const res = await request(app).get('/get/compatibility/json');
-    expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'GET_compatibility_200_OK.json' });
-  });
-
   test('POST', async () => {
     const res = await request(app).post('/post/json');
     expect(res.status).toEqual(200);

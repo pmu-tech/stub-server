@@ -11,10 +11,6 @@ const config: StubServerConfig = {
     '/get/png/noFile': { GET: `${stubsPath}/GET_200_OK-noFile.png` },
 
     '/get/json': { GET: `${stubsPath}/GET_200_OK.json` },
-    '/get/compatibility/json': {
-      // @ts-ignore
-      get: `${stubsPath}/GET_compatibility_200_OK.json`
-    },
 
     '/get/png': { GET: `${stubsPath}/GET_200_OK.png` },
     '/get/ts': { GET: `${stubsPath}/GET_200_OK.ts` },
