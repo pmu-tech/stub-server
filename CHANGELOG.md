@@ -1,3 +1,9 @@
+## 0.5.0 (2021/11/16)
+
+- Breaking change: remove lower case HTTP request methods
+- Update npm packages
+- Test with Node.js 16 (GitHub CI)
+
 ## 0.4.1 (2021/11/15)
 
 - Improve documentation
