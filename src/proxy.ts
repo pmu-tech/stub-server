@@ -1,9 +1,7 @@
 import express from 'express';
 import { createProxyServer } from 'http-proxy';
 
-const proxy = createProxyServer({ changeOrigin: true });
-
-export const send = (
+const send = (
   target: string,
   req: express.Request,
   res: express.Response,
@@ -19,5 +17,13 @@ export const send = (
   //
   // [Proxy with express.js](https://stackoverflow.com/q/10435407)
 
+  const proxy = createProxyServer({
+    // Explanations: https://github.com/http-party/node-http-proxy/pull/1130
+    changeOrigin: true,
+    cookieDomainRewrite: req.hostname
+  });
+
   proxy.web(req, res, { target }, next);
 };
+
+export { send };
