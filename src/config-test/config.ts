@@ -70,8 +70,8 @@ const config: StubServerConfig = {
       }
     },
 
-    '/get/express/ts/:param?': { GET: `${stubsPath}/GET_express.ts` },
-    '/get/express/js/:param?': { GET: `${stubsPath}/GET_express.js` },
+    '/get/express-handler/ts/:param?': { GET: `${stubsPath}/GET_express-handler.ts` },
+    '/get/express-handler/js/:param?': { GET: `${stubsPath}/GET_express-handler.js` },
 
     '/function/:param': {
       GET: { response: req => `${stubsPath}/GET_function_200_OK-${req.params.param}.json` },

@@ -395,16 +395,16 @@ test('unknown route', async () => {
   expect(res.text).toMatch(/<pre>Cannot GET \/get\/unknownRoute<\/pre>/);
 });
 
-describe('express request handler', () => {
+describe('Express handler function', () => {
   describe('ts', () => {
     test('res.send()', async () => {
-      const res = await request(app).get('/get/express/ts/send');
+      const res = await request(app).get('/get/express-handler/ts/send');
       expect(res.status).toEqual(200);
       expect(res.body).toEqual({ param: 'send' });
     });
 
     test('res.send() async', async () => {
-      const res = await request(app).get('/get/express/ts/sendAsync');
+      const res = await request(app).get('/get/express-handler/ts/sendAsync');
       expect(res.status).toEqual(200);
       expect(res.body).toEqual({ param: 'sendAsync' });
     });
@@ -412,11 +412,11 @@ describe('express request handler', () => {
     // eslint-disable-next-line jest/expect-expect
     test('res.status()', async () => {
       // Timeout - Async callback was not invoked within the 5000ms timeout specified by jest.setTimeout.Timeout
-      // await request(app).get('/get/express/ts/status');
+      // await request(app).get('/get/express-handler/ts/status');
     });
 
     test('res.end()', async () => {
-      const res = await request(app).get('/get/express/ts/end');
+      const res = await request(app).get('/get/express-handler/ts/end');
       expect(res.status).toEqual(200);
       expect(res.body).toEqual({});
       expect(res.text).toEqual('');
@@ -425,11 +425,11 @@ describe('express request handler', () => {
     // eslint-disable-next-line jest/expect-expect
     test('do nothing', async () => {
       // Timeout - Async callback was not invoked within the 5000ms timeout specified by jest.setTimeout.Timeout
-      // await request(app).get('/get/express/ts/doNothing');
+      // await request(app).get('/get/express-handler/ts/doNothing');
     });
 
     test('without param', async () => {
-      const res = await request(app).get('/get/express/ts');
+      const res = await request(app).get('/get/express-handler/ts');
       expect(res.status).toEqual(204);
       expect(res.body).toEqual({});
       expect(res.text).toEqual('');
@@ -437,7 +437,7 @@ describe('express request handler', () => {
   });
 
   test('js', async () => {
-    const res = await request(app).get('/get/express/js/param');
+    const res = await request(app).get('/get/express-handler/js/param');
     expect(res.status).toEqual(200);
     expect(res.body).toEqual({ param: 'param' });
   });
