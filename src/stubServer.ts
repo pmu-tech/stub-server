@@ -102,6 +102,8 @@ async function parseConfig(apiPath: string, req: express.Request) {
   return name;
 }
 
+type ExpressHandlerFunction = (req: express.Request, res: express.Response) => void;
+
 async function processStubRequest(
   apiPath: string,
   req: express.Request,
@@ -116,38 +118,32 @@ async function processStubRequest(
   } else {
     const filename = stubName;
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    let fileContent: string | object | undefined;
+    const match = /_(\d+)_[A-Za-z]+/.exec(filename);
+    const httpStatus = match !== null ? Number(match![1]) : 200; // 200: default HTTP status if none specified
 
-    if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
-      // Can load .json, .js or .ts files
-      // If file does not exist: "Cannot find module '...'"
-      deleteRequireCache(filename);
-      const jsFileContent = (await import(filename)).default;
-
-      if (
-        (filename.endsWith('.js') || filename.endsWith('.ts')) &&
-        typeof jsFileContent === 'function'
-      ) {
-        // Assume the function is an Express request handler
-        jsFileContent(req, res);
-      } else {
-        fileContent = jsFileContent;
-      }
+    if (httpStatus === 204 /* No Content */) {
+      res.status(httpStatus).end();
     } else {
-      // Anything else: .html, .jpg...
-      // If file does not exist: "ENOENT: no such file or directory, open '...'"
-      fileContent = fs.readFileSync(filename);
-    }
+      let fileContent: ExpressHandlerFunction | object | Buffer | undefined;
 
-    if (fileContent !== undefined) {
-      const match = /_(\d+)_[A-Za-z]+/.exec(filename);
-      const httpStatus = match !== null ? Number(match![1]) : 200; // 200: default HTTP status if none specified
+      if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
+        // If file does not exist: "Cannot find module '...'"
+        deleteRequireCache(filename);
+        const jsFileContent = (await import(filename)).default as object | ExpressHandlerFunction;
 
-      if (httpStatus === 204 /* No Content */) {
-        res.status(httpStatus).end();
+        if (typeof jsFileContent === 'function') {
+          jsFileContent(req, res);
+        } else {
+          fileContent = jsFileContent;
+        }
       } else {
-        res.status(httpStatus).send(fileContent);
+        // Anything else: .html, .jpg...
+        // If file does not exist: "ENOENT: no such file or directory, open '...'"
+        fileContent = fs.readFileSync(filename);
+      }
+
+      if (fileContent !== undefined) {
+        res.status(httpStatus).send(fileContent as object | Buffer);
       }
     }
   }
