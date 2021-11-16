@@ -202,7 +202,7 @@ describe('proxy', () => {
     test('URL redirection with param', async () => {
       const sendToProxyMock = jest
         .spyOn(proxy, 'send')
-        .mockImplementationOnce(
+        .mockImplementation(
           (
             _target: string,
             _req: express.Request,
@@ -222,7 +222,7 @@ describe('proxy', () => {
     test('URL redirection to unknown host', async () => {
       const sendToProxyMock = jest
         .spyOn(proxy, 'send')
-        .mockImplementationOnce(
+        .mockImplementation(
           (
             _target: string,
             _req: express.Request,
@@ -255,7 +255,7 @@ describe('proxy', () => {
     test('POST multipart request', async () => {
       const sendToProxyMock = jest
         .spyOn(proxy, 'send')
-        .mockImplementationOnce(
+        .mockImplementation(
           (
             _target: string,
             _req: express.Request,
