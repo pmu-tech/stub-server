@@ -10,3 +10,5 @@ dist/
 coverage/
 *.png
 *.txt
+
+src/config-test/GET_js-with-json-file-extension.json

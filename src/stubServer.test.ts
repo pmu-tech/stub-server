@@ -72,6 +72,12 @@ describe('files', () => {
     const html = (res.body as Buffer).toString();
     expect(html).toEqual('<!DOCTYPE html>\n<title>GET_html_200_OK.html</title>\n');
   });
+
+  // eslint-disable-next-line jest/expect-expect
+  test('JavaScript inside .json file', async () => {
+    // Crash with "SyntaxError: Unexpected token m in JSON at position 0 ..."
+    // await request(app).get('/get/js-with-json-file-extension');
+  });
 });
 
 describe('HTTP status codes', () => {

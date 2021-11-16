@@ -16,6 +16,9 @@ const config: StubServerConfig = {
     '/get/ts': { GET: `${stubsPath}/GET_200_OK.ts` },
     '/get/js': { GET: `${stubsPath}/GET_200_OK.js` },
     '/get/html': { GET: `${stubsPath}/GET_200_OK.html` },
+    '/get/js-with-json-file-extension': {
+      GET: `${stubsPath}/GET_js-with-json-file-extension.json`
+    },
 
     '/get/666_invalidHttpStatus': { GET: `${stubsPath}/GET_666_invalidHttpStatus.json` },
     '/get/400_BadRequest': { GET: `${stubsPath}/GET_400_BadRequest.json` },
