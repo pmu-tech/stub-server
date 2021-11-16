@@ -2,6 +2,7 @@ import express from 'express';
 import { createProxyServer } from 'http-proxy';
 
 import { fixRequestBody } from './fixRequestBody';
+import { removeSecureFromSetCookie } from './removeSecureFromSetCookie';
 
 const send = (
   target: string,
@@ -26,6 +27,7 @@ const send = (
   });
 
   proxy.on('proxyReq', fixRequestBody);
+  proxy.on('proxyRes', removeSecureFromSetCookie);
   proxy.web(req, res, { target }, next);
 };
 
