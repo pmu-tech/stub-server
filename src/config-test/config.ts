@@ -20,7 +20,9 @@ const config: StubServerConfig = {
     '/get/666_invalidHttpStatus': { GET: `${stubsPath}/GET_666_invalidHttpStatus.json` },
     '/get/400_BadRequest': { GET: `${stubsPath}/GET_400_BadRequest.json` },
     '/get/500_InternalServerError': { GET: `${stubsPath}/GET_500_InternalServerError.json` },
-    '/get/204_NoContent': { GET: `${stubsPath}/GET_204_NoContent.json` },
+    '/get/204_NoContent-empty-txt': { GET: `${stubsPath}/GET_204_NoContent-empty.txt` },
+    '/get/204_NoContent-filled-json': { GET: `${stubsPath}/GET_204_NoContent-filled.json` },
+    '/get/204_NoContent-empty-json': { GET: `${stubsPath}/GET_204_NoContent-empty.json` },
 
     '/post/json': { POST: `${stubsPath}/POST_200_OK.json` },
     '/put/json': { PUT: `${stubsPath}/PUT_200_OK.json` },

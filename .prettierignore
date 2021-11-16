@@ -9,3 +9,4 @@ LICENSE
 dist/
 coverage/
 *.png
+*.txt

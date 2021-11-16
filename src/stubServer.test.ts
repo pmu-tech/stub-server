@@ -93,11 +93,27 @@ describe('HTTP status codes', () => {
     expect(res.body).toEqual({ stub: 'GET_500_InternalServerError.json' });
   });
 
-  test('204 No Content', async () => {
-    const res = await request(app).get('/get/204_NoContent');
-    expect(res.status).toEqual(204);
-    expect(res.body).toEqual({});
-    expect(res.text).toEqual('');
+  describe('204 No Content', () => {
+    test('empty .txt file', async () => {
+      const res = await request(app).get('/get/204_NoContent-empty-txt');
+      expect(res.status).toEqual(204);
+      expect(res.body).toEqual({});
+      expect(res.text).toEqual('');
+    });
+
+    test('filled .json file', async () => {
+      const res = await request(app).get('/get/204_NoContent-filled-json');
+      expect(res.status).toEqual(204);
+      expect(res.body).toEqual({});
+      expect(res.text).toEqual('');
+    });
+
+    test('empty .json file should not crash', async () => {
+      const res = await request(app).get('/get/204_NoContent-empty-json');
+      expect(res.status).toEqual(204);
+      expect(res.body).toEqual({});
+      expect(res.text).toEqual('');
+    });
   });
 });
 
