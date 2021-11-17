@@ -27,16 +27,30 @@ describe('files', () => {
     expect(res.body).toEqual({ stub: 'GET_noHttpStatus.json' });
   });
 
-  // eslint-disable-next-line jest/expect-expect
   test('json file does not exist', async () => {
-    // Crash with "Cannot find module 'config-test/GET_200_OK-noFile.json' from 'stubServer.ts'"
-    // await request(app).get('/get/json/noFile');
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const res = await request(app).get('/get/json/noFile');
+    expect(res.status).toEqual(500);
+    expect(res.body).toEqual({});
+    expect(res.text).toContain('Error: Cannot find module');
+    expect(res.text).toContain('GET_200_OK-noFile.json');
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    consoleErrorSpy.mockRestore();
   });
 
-  // eslint-disable-next-line jest/expect-expect
   test('png file does not exist', async () => {
-    // Crash with "ENOENT: no such file or directory, open 'config-test/GET_200_OK-noFile.png'"
-    // await request(app).get('/get/png/noFile');
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const res = await request(app).get('/get/png/noFile');
+    expect(res.status).toEqual(500);
+    expect(res.body).toEqual({});
+    expect(res.text).toContain('Error: ENOENT: no such file or directory');
+    expect(res.text).toContain('GET_200_OK-noFile.png');
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    consoleErrorSpy.mockRestore();
   });
 
   test('json', async () => {
@@ -73,10 +87,17 @@ describe('files', () => {
     expect(html).toEqual('<!DOCTYPE html>\n<title>GET_200_OK.html</title>\n');
   });
 
-  // eslint-disable-next-line jest/expect-expect
   test('JavaScript inside .json file', async () => {
-    // Crash with "SyntaxError: Unexpected token m in JSON at position 0 ..."
-    // await request(app).get('/get/js-with-json-file-extension');
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const res = await request(app).get('/get/js-with-json-file-extension');
+    expect(res.status).toEqual(500);
+    expect(res.body).toEqual({});
+    expect(res.text).toContain('SyntaxError: Unexpected token m in JSON at position 0');
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Unexpected token m in JSON at position 0');
+    consoleErrorSpy.mockRestore();
   });
 });
 
@@ -130,10 +151,18 @@ describe('HTTP request methods', () => {
     // stubServer.ts throws "Invalid HTTP request method: 'foobar'"
   });
 
-  // eslint-disable-next-line jest/expect-expect
-  test('HEAD', async () => {
-    // await request(app).head('/get/json');
-    // Throws "No route for 'HEAD' HTTP request method"
+  test('HEAD not supported', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const res = await request(app).head('/get/json');
+    expect(res.status).toEqual(500);
+    // request(app).head() won't return the body (which is expected)
+    expect(res.body).toEqual({});
+    expect(res.text).toEqual(undefined);
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenCalledWith("No route for 'HEAD' HTTP request method");
+    consoleErrorSpy.mockRestore();
   });
 
   test('GET', async () => {
