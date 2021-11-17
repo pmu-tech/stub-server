@@ -57,20 +57,20 @@ describe('files', () => {
   test('ts', async () => {
     const res = await request(app).get('/get/ts');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'GET_ts_200_OK.ts' });
+    expect(res.body).toEqual({ stub: 'GET_200_OK.ts' });
   });
 
   test('js', async () => {
     const res = await request(app).get('/get/js');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'GET_js_200_OK.js' });
+    expect(res.body).toEqual({ stub: 'GET_200_OK.js' });
   });
 
   test('html', async () => {
     const res = await request(app).get('/get/html');
     expect(res.status).toEqual(200);
     const html = (res.body as Buffer).toString();
-    expect(html).toEqual('<!DOCTYPE html>\n<title>GET_html_200_OK.html</title>\n');
+    expect(html).toEqual('<!DOCTYPE html>\n<title>GET_200_OK.html</title>\n');
   });
 
   // eslint-disable-next-line jest/expect-expect

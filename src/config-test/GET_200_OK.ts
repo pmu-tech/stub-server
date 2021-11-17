@@ -1,3 +1,3 @@
 export default {
-  stub: 'GET_ts_200_OK.ts'
+  stub: 'GET_200_OK.ts'
 };
