@@ -1,3 +1,10 @@
+## 0.6.0 (2021/11/17)
+
+- In proxy mode:
+  - rewrite cookie domain
+  - fix request body
+  - remove Secure from Set-Cookie header
+
 ## 0.5.0 (2021/11/16)
 
 - Breaking change: remove lower case HTTP request methods
