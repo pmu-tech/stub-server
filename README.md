@@ -43,12 +43,12 @@ webpack.config.ts
 ### stubs/config.ts
 
 ```TypeScript
-import { resolve } from 'path';
+import path from 'path';
 import { StubServerConfig } from '@pmu-tech/stub-server';
 
 const prod = 'https://pmu.fr';
 
-const stubsPath = resolve(__dirname, 'routes');
+const stubsPath = path.resolve(__dirname, 'routes');
 
 const config: StubServerConfig = {
   delay: { min: 500, max: 3000 },
@@ -79,6 +79,8 @@ config.routes[`${rootApiPath}/my/api7`] = { GET: `${stubsPath}/my_api7_GET_200_O
 
 export default config; // Or "exports.default = config"
 ```
+
+Note: `stubs/config.ts` written in TypeScript instead of JavaScript requires [ts-node](https://github.com/TypeStrong/ts-node)
 
 ### webpack.config.ts
 
@@ -208,6 +210,10 @@ app.prepare().then(() => {
   }
 }
 ```
+
+## Errors
+
+If an error occurs (missing stub or route) while stub-server is processing a request, the error is returned in the response with status 500 (Internal Server Error) and is also displayed in the console.
 
 ## Contributing
 
