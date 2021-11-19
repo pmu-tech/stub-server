@@ -1,6 +1,7 @@
 import express from 'express';
 import fs from 'fs';
 import { IncomingHttpHeaders } from 'http';
+import path from 'path';
 
 import { send } from './proxy';
 
@@ -126,7 +127,7 @@ async function processStubRequest(
       } else {
         let fileContent: ExpressHandlerFunction | object | Buffer | undefined;
 
-        if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
+        if (['.json', '.js', '.ts'].includes(path.extname(filename))) {
           // If file does not exist: "Cannot find module '...'"
           deleteRequireCache(filename);
           const jsFileContent = (await import(filename)).default as object | ExpressHandlerFunction;
