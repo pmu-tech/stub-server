@@ -1,3 +1,7 @@
+## 0.6.1 (2021/12/07)
+
+- Improve internal algorithm & unit tests
+
 ## 0.6.0 (2021/11/17)
 
 - In proxy mode:
