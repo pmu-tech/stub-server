@@ -16,11 +16,16 @@ const config: StubServerConfig = {
     '/get/ts': { GET: `${stubsPath}/GET_200_OK.ts` },
     '/get/js': { GET: `${stubsPath}/GET_200_OK.js` },
     '/get/html': { GET: `${stubsPath}/GET_200_OK.html` },
+    '/get/js-with-json-file-extension': {
+      GET: `${stubsPath}/GET_js-with-json-file-extension.json`
+    },
 
     '/get/666_invalidHttpStatus': { GET: `${stubsPath}/GET_666_invalidHttpStatus.json` },
     '/get/400_BadRequest': { GET: `${stubsPath}/GET_400_BadRequest.json` },
     '/get/500_InternalServerError': { GET: `${stubsPath}/GET_500_InternalServerError.json` },
-    '/get/204_NoContent': { GET: `${stubsPath}/GET_204_NoContent.json` },
+    '/get/204_NoContent-empty-txt': { GET: `${stubsPath}/GET_204_NoContent-empty.txt` },
+    '/get/204_NoContent-filled-json': { GET: `${stubsPath}/GET_204_NoContent-filled.json` },
+    '/get/204_NoContent-empty-json': { GET: `${stubsPath}/GET_204_NoContent-empty.json` },
 
     '/post/json': { POST: `${stubsPath}/POST_200_OK.json` },
     '/put/json': { PUT: `${stubsPath}/PUT_200_OK.json` },
@@ -70,8 +75,8 @@ const config: StubServerConfig = {
       }
     },
 
-    '/get/express/ts/:param?': { GET: `${stubsPath}/GET_express.ts` },
-    '/get/express/js/:param?': { GET: `${stubsPath}/GET_express.js` },
+    '/get/express-handler/ts/:param?': { GET: `${stubsPath}/GET_express-handler.ts` },
+    '/get/express-handler/js/:param?': { GET: `${stubsPath}/GET_express-handler.js` },
 
     '/function/:param': {
       GET: { response: req => `${stubsPath}/GET_function_200_OK-${req.params.param}.json` },

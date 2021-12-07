@@ -1,6 +1,7 @@
 import express from 'express';
 import fs from 'fs';
 import { IncomingHttpHeaders } from 'http';
+import path from 'path';
 
 import { send } from './proxy';
 
@@ -74,7 +75,6 @@ async function parseConfig(apiPath: string, req: express.Request) {
   const requestMethod = req.method as RequestMethod;
   const stub = responses[requestMethod];
 
-  // istanbul ignore next
   if (stub === undefined) {
     throw new Error(`No route for '${requestMethod}' HTTP request method`);
   }
@@ -102,54 +102,60 @@ async function parseConfig(apiPath: string, req: express.Request) {
   return name;
 }
 
+type ExpressHandlerFunction = (req: express.Request, res: express.Response) => void;
+
 async function processStubRequest(
   apiPath: string,
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
 ) {
-  const stubName = await parseConfig(apiPath, req);
+  try {
+    const stubName = await parseConfig(apiPath, req);
 
-  if (isUrl(stubName)) {
-    const url = stubName;
-    send(url, req, res, next);
-  } else {
-    const filename = stubName;
-
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    let fileContent: string | object | undefined;
-
-    if (filename.endsWith('.json') || filename.endsWith('.js') || filename.endsWith('.ts')) {
-      // Can load .json, .js or .ts files
-      // If file does not exist: "Cannot find module '...'"
-      deleteRequireCache(filename);
-      const jsFileContent = (await import(filename)).default;
-
-      if (
-        (filename.endsWith('.js') || filename.endsWith('.ts')) &&
-        typeof jsFileContent === 'function'
-      ) {
-        // Assume the function is an Express request handler
-        jsFileContent(req, res);
-      } else {
-        fileContent = jsFileContent;
-      }
+    if (isUrl(stubName)) {
+      const url = stubName;
+      send(url, req, res, next);
     } else {
-      // Anything else: .html, .jpg...
-      // If file does not exist: "ENOENT: no such file or directory, open '...'"
-      fileContent = fs.readFileSync(filename);
-    }
+      const filename = stubName;
 
-    if (fileContent !== undefined) {
       const match = /_(\d+)_[A-Za-z]+/.exec(filename);
       const httpStatus = match !== null ? Number(match![1]) : 200; // 200: default HTTP status if none specified
 
       if (httpStatus === 204 /* No Content */) {
         res.status(httpStatus).end();
       } else {
-        res.status(httpStatus).send(fileContent);
+        let fileContent: ExpressHandlerFunction | object | Buffer | undefined;
+
+        if (['.json', '.js', '.ts'].includes(path.extname(filename))) {
+          // If file does not exist: "Cannot find module '...'"
+          deleteRequireCache(filename);
+          const jsFileContent = (await import(filename)).default as object | ExpressHandlerFunction;
+
+          if (typeof jsFileContent === 'function') {
+            jsFileContent(req, res);
+          } else {
+            fileContent = jsFileContent;
+          }
+        } else {
+          // Anything else: .html, .jpg...
+          // If file does not exist: "ENOENT: no such file or directory, open '...'"
+          fileContent = fs.readFileSync(filename);
+        }
+
+        if (fileContent !== undefined) {
+          res.status(httpStatus).send(fileContent as object | Buffer);
+        }
       }
     }
+  } catch (e) {
+    console.error((e as Error).message);
+    // ["Starting with Express 5, route handlers and middleware that return
+    //  a Promise will call next(value) automatically when they reject
+    //  or throw an error"](http://expressjs.com/en/guide/error-handling.html#catching-errors)
+    //
+    // Express 5 will probably never be released :-/
+    next(e);
   }
 }
 

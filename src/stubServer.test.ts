@@ -27,16 +27,30 @@ describe('files', () => {
     expect(res.body).toEqual({ stub: 'GET_noHttpStatus.json' });
   });
 
-  // eslint-disable-next-line jest/expect-expect
   test('json file does not exist', async () => {
-    // Crash with "Cannot find module 'config-test/GET_200_OK-noFile.json' from 'stubServer.ts'"
-    // await request(app).get('/get/json/noFile');
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const res = await request(app).get('/get/json/noFile');
+    expect(res.status).toEqual(500);
+    expect(res.body).toEqual({});
+    expect(res.text).toContain('Error: Cannot find module');
+    expect(res.text).toContain('GET_200_OK-noFile.json');
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    consoleErrorSpy.mockRestore();
   });
 
-  // eslint-disable-next-line jest/expect-expect
   test('png file does not exist', async () => {
-    // Crash with "ENOENT: no such file or directory, open 'config-test/GET_200_OK-noFile.png'"
-    // await request(app).get('/get/png/noFile');
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const res = await request(app).get('/get/png/noFile');
+    expect(res.status).toEqual(500);
+    expect(res.body).toEqual({});
+    expect(res.text).toContain('Error: ENOENT: no such file or directory');
+    expect(res.text).toContain('GET_200_OK-noFile.png');
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    consoleErrorSpy.mockRestore();
   });
 
   test('json', async () => {
@@ -57,20 +71,33 @@ describe('files', () => {
   test('ts', async () => {
     const res = await request(app).get('/get/ts');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'GET_ts_200_OK.ts' });
+    expect(res.body).toEqual({ stub: 'GET_200_OK.ts' });
   });
 
   test('js', async () => {
     const res = await request(app).get('/get/js');
     expect(res.status).toEqual(200);
-    expect(res.body).toEqual({ stub: 'GET_js_200_OK.js' });
+    expect(res.body).toEqual({ stub: 'GET_200_OK.js' });
   });
 
   test('html', async () => {
     const res = await request(app).get('/get/html');
     expect(res.status).toEqual(200);
     const html = (res.body as Buffer).toString();
-    expect(html).toEqual('<!DOCTYPE html>\n<title>GET_html_200_OK.html</title>\n');
+    expect(html).toEqual('<!DOCTYPE html>\n<title>GET_200_OK.html</title>\n');
+  });
+
+  test('JavaScript inside .json file', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const res = await request(app).get('/get/js-with-json-file-extension');
+    expect(res.status).toEqual(500);
+    expect(res.body).toEqual({});
+    expect(res.text).toContain('SyntaxError: Unexpected token m in JSON at position 0');
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Unexpected token m in JSON at position 0');
+    consoleErrorSpy.mockRestore();
   });
 });
 
@@ -93,11 +120,27 @@ describe('HTTP status codes', () => {
     expect(res.body).toEqual({ stub: 'GET_500_InternalServerError.json' });
   });
 
-  test('204 No Content', async () => {
-    const res = await request(app).get('/get/204_NoContent');
-    expect(res.status).toEqual(204);
-    expect(res.body).toEqual({});
-    expect(res.text).toEqual('');
+  describe('204 No Content', () => {
+    test('empty .txt file', async () => {
+      const res = await request(app).get('/get/204_NoContent-empty-txt');
+      expect(res.status).toEqual(204);
+      expect(res.body).toEqual({});
+      expect(res.text).toEqual('');
+    });
+
+    test('filled .json file', async () => {
+      const res = await request(app).get('/get/204_NoContent-filled-json');
+      expect(res.status).toEqual(204);
+      expect(res.body).toEqual({});
+      expect(res.text).toEqual('');
+    });
+
+    test('empty .json file should not crash', async () => {
+      const res = await request(app).get('/get/204_NoContent-empty-json');
+      expect(res.status).toEqual(204);
+      expect(res.body).toEqual({});
+      expect(res.text).toEqual('');
+    });
   });
 });
 
@@ -108,10 +151,18 @@ describe('HTTP request methods', () => {
     // stubServer.ts throws "Invalid HTTP request method: 'foobar'"
   });
 
-  // eslint-disable-next-line jest/expect-expect
-  test('HEAD', async () => {
-    // await request(app).head('/get/json');
-    // Throws "No route for 'HEAD' HTTP request method"
+  test('HEAD not supported', async () => {
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+    const res = await request(app).head('/get/json');
+    expect(res.status).toEqual(500);
+    // request(app).head() won't return the body (which is expected)
+    expect(res.body).toEqual({});
+    expect(res.text).toEqual(undefined);
+
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
+    expect(consoleErrorSpy).toHaveBeenCalledWith("No route for 'HEAD' HTTP request method");
+    consoleErrorSpy.mockRestore();
   });
 
   test('GET', async () => {
@@ -202,7 +253,7 @@ describe('proxy', () => {
     test('URL redirection with param', async () => {
       const sendToProxyMock = jest
         .spyOn(proxy, 'send')
-        .mockImplementationOnce(
+        .mockImplementation(
           (
             _target: string,
             _req: express.Request,
@@ -222,7 +273,7 @@ describe('proxy', () => {
     test('URL redirection to unknown host', async () => {
       const sendToProxyMock = jest
         .spyOn(proxy, 'send')
-        .mockImplementationOnce(
+        .mockImplementation(
           (
             _target: string,
             _req: express.Request,
@@ -255,7 +306,7 @@ describe('proxy', () => {
     test('POST multipart request', async () => {
       const sendToProxyMock = jest
         .spyOn(proxy, 'send')
-        .mockImplementationOnce(
+        .mockImplementation(
           (
             _target: string,
             _req: express.Request,
@@ -395,28 +446,28 @@ test('unknown route', async () => {
   expect(res.text).toMatch(/<pre>Cannot GET \/get\/unknownRoute<\/pre>/);
 });
 
-describe('express request handler', () => {
+describe('Express handler function', () => {
   describe('ts', () => {
     test('res.send()', async () => {
-      const res = await request(app).get('/get/express/ts/send');
+      const res = await request(app).get('/get/express-handler/ts/send');
       expect(res.status).toEqual(200);
       expect(res.body).toEqual({ param: 'send' });
     });
 
     test('res.send() async', async () => {
-      const res = await request(app).get('/get/express/ts/sendAsync');
+      const res = await request(app).get('/get/express-handler/ts/sendAsync');
       expect(res.status).toEqual(200);
       expect(res.body).toEqual({ param: 'sendAsync' });
     });
 
     // eslint-disable-next-line jest/expect-expect
     test('res.status()', async () => {
-      // Timeout - Async callback was not invoked within the 5000ms timeout specified by jest.setTimeout.Timeout
-      // await request(app).get('/get/express/ts/status');
+      // Timeout because the stub does not send a response
+      // await request(app).get('/get/express-handler/ts/status');
     });
 
     test('res.end()', async () => {
-      const res = await request(app).get('/get/express/ts/end');
+      const res = await request(app).get('/get/express-handler/ts/end');
       expect(res.status).toEqual(200);
       expect(res.body).toEqual({});
       expect(res.text).toEqual('');
@@ -424,12 +475,12 @@ describe('express request handler', () => {
 
     // eslint-disable-next-line jest/expect-expect
     test('do nothing', async () => {
-      // Timeout - Async callback was not invoked within the 5000ms timeout specified by jest.setTimeout.Timeout
-      // await request(app).get('/get/express/ts/doNothing');
+      // Timeout because the stub does not send a response
+      // await request(app).get('/get/express-handler/ts/doNothing');
     });
 
     test('without param', async () => {
-      const res = await request(app).get('/get/express/ts');
+      const res = await request(app).get('/get/express-handler/ts');
       expect(res.status).toEqual(204);
       expect(res.body).toEqual({});
       expect(res.text).toEqual('');
@@ -437,7 +488,7 @@ describe('express request handler', () => {
   });
 
   test('js', async () => {
-    const res = await request(app).get('/get/express/js/param');
+    const res = await request(app).get('/get/express-handler/js/param');
     expect(res.status).toEqual(200);
     expect(res.body).toEqual({ param: 'param' });
   });

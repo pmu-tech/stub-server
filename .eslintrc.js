@@ -77,6 +77,7 @@ const config = {
 
     'unicorn/filename-case': 'off',
     'unicorn/prevent-abbreviations': 'off',
+    'unicorn/catch-error-name': 'off',
     // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/v27.0.0/docs/rules/no-array-for-each.md
     // https://github.com/github/eslint-plugin-github/blob/v4.1.1/docs/rules/array-foreach.md
     // conflicts with

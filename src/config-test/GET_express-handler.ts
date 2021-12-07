@@ -14,6 +14,7 @@ export default function stub(req: express.Request, res: express.Response) {
 
     // istanbul ignore next
     case 'status':
+      // No response
       res.status(202 /* Accepted */);
       break;
 
@@ -23,6 +24,7 @@ export default function stub(req: express.Request, res: express.Response) {
 
     // istanbul ignore next
     case 'doNothing':
+      // No response
       break;
 
     default:
