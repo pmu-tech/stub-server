@@ -1,11 +1,8 @@
 {
   "name": "@pmu-tech/stub-server",
   "version": "0.6.1",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/pmu-tech/stub-server.git"
-  },
   "description": "Stub server for REST APIs",
+  "repository": "github:pmu-tech/stub-server",
   "author": "PMU",
   "license": "MIT",
   "keywords": [
