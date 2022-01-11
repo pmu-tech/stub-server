@@ -45,13 +45,33 @@ test('correct config param', done => {
   killStubServerAfterRunning(process);
 });
 
-test('correct config and port params', done => {
+test('port option', done => {
   expect.assertions(2);
 
   const process = spawn(bin, ['--config', correctConfig, '--port', correctPort]);
   process.stdout.on('data', data => {
     expect(cleanAnsi(data.toString())).toEqual(
       `stub-server is running at http://127.0.0.1:${correctPort}\n`
+    );
+  });
+  process.stderr.on('data', data => {
+    expect(data.toString()).toEqual('Never reached');
+  });
+  process.on('exit', code => {
+    expect(code).toEqual(EXIT_SIGTERM);
+    done();
+  });
+
+  killStubServerAfterRunning(process);
+});
+
+test('no-delay option', done => {
+  expect.assertions(2);
+
+  const process = spawn(bin, ['--config', correctConfig, '--no-delay']);
+  process.stdout.on('data', data => {
+    expect(cleanAnsi(data.toString())).toEqual(
+      'stub-server is running at http://127.0.0.1:12345\n'
     );
   });
   process.stderr.on('data', data => {
@@ -116,7 +136,7 @@ test('incorrect config param', done => {
   });
 });
 
-test('incorrect port param', done => {
+test('incorrect port option', done => {
   expect.assertions(2);
 
   const process = spawn(bin, ['--config', correctConfig, '--port', '80']);

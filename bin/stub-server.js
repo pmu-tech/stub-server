@@ -13,6 +13,7 @@ const { stubServer } = require('../dist/cjs/stubServer');
 program
   .option('-p, --port <port>', 'stub server port', '12345')
   .option('-c, --config <config>', 'config file', 'stubs/config')
+  .option('--no-delay', 'ignore any delay specified in the config', false)
   .parse();
 
 // https://en.wikipedia.org/wiki/ANSI_escape_code
@@ -45,4 +46,4 @@ const server = app.listen(port, host, () => {
   );
 });
 
-stubServer(config, app);
+stubServer(config, app, { delay: options.delay });

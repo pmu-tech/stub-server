@@ -162,6 +162,7 @@ Usage: stub-server [options]
 Options:
   -p, --port <port>      stub server port (default: "12345")
   -c, --config <config>  config file (default: "stubs/config")
+  --no-delay             ignore any delay specified in the config
   -h, --help             display help for command
 ```
 

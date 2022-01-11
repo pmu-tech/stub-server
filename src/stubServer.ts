@@ -60,6 +60,8 @@ function getConfig() {
   return require(_configPath).default as StubServerConfig;
 }
 
+let _delay: boolean;
+
 async function parseConfig(apiPath: string, req: express.Request) {
   // Re-read the config file for each new request so the user
   // don't have to restart the stub server
@@ -95,7 +97,7 @@ async function parseConfig(apiPath: string, req: express.Request) {
   // Delay the request to simulate network latency
   // istanbul ignore next
   const { min, max } = delay ?? routeDelay ?? globalDelay ?? { min: 0, max: 0 };
-  const actualDelay = await randomDelay(min, max);
+  const actualDelay = _delay ? await randomDelay(min, max) : 0;
 
   console.log(`${requestMethod} ${req.url} => ${name}, delay: ${actualDelay} ms`);
 
@@ -162,11 +164,19 @@ async function processStubRequest(
 // https://expressjs.com/en/4x/api.html#router.METHOD
 type ExpressMethod = 'get' | 'post' | 'put' | 'patch' | 'delete' | 'options' | 'head';
 
-export function stubServer(configPath: string, app: express.Application) {
+type Options = {
+  /**
+   * If false, ignore any delay specified in the config.
+   */
+  delay?: boolean;
+};
+
+export function stubServer(configPath: string, app: express.Application, options: Options = {}) {
   // Do not use asynchronous code here otherwise routes will
   // be defined after the ones from webpack-dev-server
 
   _configPath = configPath;
+  _delay = options.delay ?? true;
 
   const { routes } = getConfig();
 

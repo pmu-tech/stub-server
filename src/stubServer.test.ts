@@ -6,13 +6,8 @@ import * as proxy from './proxy';
 import { stubServer } from './stubServer';
 
 const configPath = path.resolve(__dirname, 'config-test', 'config');
-
-let app: express.Express;
-
-beforeAll(() => {
-  app = express();
-  stubServer(configPath, app);
-});
+const app = express();
+stubServer(configPath, app);
 
 let consoleSpy: jest.SpyInstance;
 beforeEach(() => {
