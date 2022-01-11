@@ -1,9 +1,9 @@
-# https://github.com/actions/starter-workflows/blob/56c93ff7521bd818b4186cd504aba6e2b7b42643/ci/node.js.yml
+# https://github.com/actions/starter-workflows/blob/51e7c8e1e6c69cb6b41e142d579da95a44191ce3/ci/node.js.yml
 
 name: Node.js CI
 
 # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#on
-on: [push, pull_request]
+on: push
 
 jobs:
   build:
