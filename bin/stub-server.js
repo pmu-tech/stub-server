@@ -11,8 +11,8 @@ const path = require('path');
 const { stubServer } = require('../dist/cjs/stubServer');
 
 program
-  .option('-p, --port <port>', 'stub server port', '12345')
-  .option('-c, --config <config>', 'config file', 'stubs/config')
+  .option('--port <port>', 'stub server port', '12345')
+  .option('--config <config>', 'config file', 'stubs/config')
   .option('--no-delay', 'ignore any delay specified in the config', false)
   .parse();
 
