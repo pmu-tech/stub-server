@@ -120,7 +120,7 @@ test('network request', done => {
   });
 });
 
-test('incorrect config argument', done => {
+test('invalid config argument', done => {
   expect.assertions(2);
 
   const process = spawn(bin, ['notFound']);
@@ -136,7 +136,7 @@ test('incorrect config argument', done => {
   });
 });
 
-test('incorrect port option', done => {
+test('invalid port option', done => {
   expect.assertions(2);
 
   const process = spawn(bin, [config, '--port', '80']);
