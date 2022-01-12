@@ -174,6 +174,7 @@ async function processStubRequest(
         if (['.json', '.js', '.ts'].includes(path.extname(filename))) {
           // If file does not exist: "Cannot find module '...'"
           deleteRequireCache(filename);
+          // eslint-disable-next-line unicorn/no-await-expression-member
           const jsFileContent = (await import(filename)).default as object | ExpressHandlerFunction;
 
           if (typeof jsFileContent === 'function') {
