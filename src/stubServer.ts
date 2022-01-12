@@ -15,15 +15,57 @@ type Stub = URL | StubFilename | GetStubFilenameFunction;
 
 type Delay = { min: number; max: number };
 
-type CommonConfig = { delay?: Delay; headers?: IncomingHttpHeaders };
+type CommonConfig = {
+  /**
+   * Delay in ms before processing the request.
+   *
+   * Simulates an unreliable network connection.
+   * Help find bugs and possible improvements (add a spinner, disable a submit button...) to your code.
+   */
+  delay?: Delay;
+
+  /**
+   * HTTP headers of the request received by the stub server to override.
+   */
+  headers?: IncomingHttpHeaders;
+};
 
 type Response = {
-  [requestMethod in RequestMethod]?: Stub | (CommonConfig & { response: Stub });
+  [requestMethod in RequestMethod]?:
+    | Stub
+    | (CommonConfig & {
+        /**
+         * The response the stub server will return.
+         *
+         * Can be:
+         *
+         * - a file:
+         *
+         *   - .json, .html, .jpg, .txt...: will be returned as is,
+         *     the returned HTTP status code is determined by the file name (ex: `my-api_400_BadRequest.json`)
+         *
+         *   - .js, .ts:
+         *     - can default export an [Express handler function](http://expressjs.com/en/guide/routing.html#route-handlers) with req and res
+         *     - otherwise will be returned as is (useful when you need a .json file with comments)
+         *
+         * - a URL: the request will be routed there (proxy mode)
+         *
+         * - a callback with [req](http://expressjs.com/en/4x/api.html#req) as parameter,
+         *   should return a file name or a URL
+         */
+        response: Stub;
+      });
 };
 
 type Route = CommonConfig & Response;
 
+/**
+ * Stub server config.
+ */
 export type StubServerConfig = CommonConfig & {
+  /**
+   * List of HTTP routes to handle.
+   */
   routes: {
     [apiPath: string]: Route;
   };
@@ -171,6 +213,13 @@ type Options = {
   delay?: boolean;
 };
 
+/**
+ * Starts the stub server: responds to HTTP requests based on the config.
+ *
+ * @param configPath path to the config file
+ * @param app the [Express application](https://expressjs.com/en/4x/api.html#express)
+ * @param options optional parameters
+ */
 export function stubServer(configPath: string, app: express.Application, options: Options = {}) {
   // Do not use asynchronous code here otherwise routes will
   // be defined after the ones from webpack-dev-server
