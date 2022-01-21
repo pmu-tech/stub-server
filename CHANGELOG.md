@@ -1,4 +1,4 @@
-## Next
+## 0.7.0 (2022/01/21)
 
 - Breaking change: CLI config path is now an argument instead of an option
 - Breaking change: remove CLI short options
