@@ -1,11 +1,13 @@
+/* eslint-disable jest/no-done-callback */
+
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import http from 'http';
 
 // If something goes wrong with these tests, use "killall node"
 
 const bin = './bin/stub-server.js';
-const correctConfig = 'bin/config-test';
-const correctPort = '16928';
+const config = 'bin/config-test';
+const port = '16928';
 
 // https://en.cppreference.com/w/cpp/utility/program/EXIT_status
 // @ts-ignore
@@ -23,11 +25,10 @@ const cleanAnsi = (str: string) =>
   // eslint-disable-next-line no-control-regex
   str.replace(/[\u001B\u009B][#();?[]*(?:\d{1,4}(?:;\d{0,4})*)?[\d<=>A-ORZcf-nqry]/g, '');
 
-// eslint-disable-next-line jest/no-done-callback
-test('correct config param', done => {
+test('config argument', done => {
   expect.assertions(2);
 
-  const process = spawn(bin, ['--config', correctConfig]);
+  const process = spawn(bin, [config]);
   process.stdout.on('data', data => {
     expect(cleanAnsi(data.toString())).toEqual(
       'stub-server is running at http://127.0.0.1:12345\n'
@@ -44,14 +45,13 @@ test('correct config param', done => {
   killStubServerAfterRunning(process);
 });
 
-// eslint-disable-next-line jest/no-done-callback
-test('correct config and port params', done => {
+test('port option', done => {
   expect.assertions(2);
 
-  const process = spawn(bin, ['--config', correctConfig, '--port', correctPort]);
+  const process = spawn(bin, [config, '--port', port]);
   process.stdout.on('data', data => {
     expect(cleanAnsi(data.toString())).toEqual(
-      `stub-server is running at http://127.0.0.1:${correctPort}\n`
+      `stub-server is running at http://127.0.0.1:${port}\n`
     );
   });
   process.stderr.on('data', data => {
@@ -65,17 +65,36 @@ test('correct config and port params', done => {
   killStubServerAfterRunning(process);
 });
 
-// eslint-disable-next-line jest/no-done-callback
+test('no-delay option', done => {
+  expect.assertions(2);
+
+  const process = spawn(bin, [config, '--no-delay']);
+  process.stdout.on('data', data => {
+    expect(cleanAnsi(data.toString())).toEqual(
+      'stub-server is running at http://127.0.0.1:12345\n'
+    );
+  });
+  process.stderr.on('data', data => {
+    expect(data.toString()).toEqual('Never reached');
+  });
+  process.on('exit', code => {
+    expect(code).toEqual(EXIT_SIGTERM);
+    done();
+  });
+
+  killStubServerAfterRunning(process);
+});
+
 test('network request', done => {
   // Unfortunately it does not test CORS because the request is performed server side :-/
   // Users perform requests in a web browser where CORS is enabled
 
   expect.assertions(3);
 
-  const process = spawn(bin, ['--config', correctConfig, '--port', correctPort]);
+  const process = spawn(bin, [config, '--port', port]);
   process.stdout.on('data', data => {
     if (data.toString().includes('stub-server is running')) {
-      http.get(`http://localhost:${correctPort}/get/json`, res => {
+      http.get(`http://localhost:${port}/get/json`, res => {
         let resData = '';
         res.on('data', chunk => {
           resData += chunk;
@@ -101,11 +120,10 @@ test('network request', done => {
   });
 });
 
-// eslint-disable-next-line jest/no-done-callback
-test('incorrect config param', done => {
+test('invalid config argument', done => {
   expect.assertions(2);
 
-  const process = spawn(bin, ['--config', 'notFound']);
+  const process = spawn(bin, ['notFound']);
   process.stdout.on('data', data => {
     expect(data.toString()).toEqual('Never reached');
   });
@@ -118,11 +136,10 @@ test('incorrect config param', done => {
   });
 });
 
-// eslint-disable-next-line jest/no-done-callback
-test('incorrect port param', done => {
+test('invalid port option', done => {
   expect.assertions(2);
 
-  const process = spawn(bin, ['--config', correctConfig, '--port', '80']);
+  const process = spawn(bin, [config, '--port', '80']);
   process.stdout.on('data', data => {
     expect(data.toString()).toEqual('Never reached');
   });

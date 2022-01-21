@@ -157,12 +157,15 @@ module.exports = (req, res) => {
 ## Command line
 
 ```
-Usage: stub-server [options]
+Usage: stub-server [options] <config>
+
+Arguments:
+  config         path to the config file
 
 Options:
-  -p, --port <port>      stub server port (default: "12345")
-  -c, --config <config>  config file (default: "stubs/config")
-  -h, --help             display help for command
+  --port <port>  stub server port (default: "12345")
+  --no-delay     ignore any delay specified in the config
+  -h, --help     display help for command
 ```
 
 ## Next.js

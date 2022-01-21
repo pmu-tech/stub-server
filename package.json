@@ -41,36 +41,36 @@
     "npm:update": "npm run clean:all && npx npm-check-updates --upgrade && npm install"
   },
   "peerDependencies": {
-    "express": "^4.17.1"
+    "express": ">=4.16"
   },
   "dependencies": {
     "commander": "^8.3.0",
     "http-proxy": "^1.18.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.0",
-    "@babel/preset-env": "^7.16.0",
-    "@babel/preset-typescript": "^7.16.0",
+    "@babel/core": "^7.16.10",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-typescript": "^7.16.7",
     "@types/express": "^4.17.13",
-    "@types/http-proxy": "^1.17.7",
-    "@types/jest": "^27.0.2",
-    "@types/node": "^16.11.7",
+    "@types/http-proxy": "^1.17.8",
+    "@types/jest": "^27.4.0",
+    "@types/node": "^17.0.10",
     "@types/supertest": "^2.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.3.1",
-    "@typescript-eslint/parser": "^5.3.1",
-    "eslint": "^8.2.0",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
+    "eslint": "^8.7.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-import": "^2.25.3",
-    "eslint-plugin-jest": "^25.2.4",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jest": "^25.7.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
-    "eslint-plugin-unicorn": "^38.0.1",
+    "eslint-plugin-unicorn": "^40.1.0",
     "express": "^4.17.1",
     "husky": "^7.0.4",
-    "jest": "^27.3.1",
-    "prettier": "^2.4.1",
-    "supertest": "^6.1.6",
-    "typescript": "^4.4.4"
+    "jest": "^27.4.7",
+    "prettier": "^2.5.1",
+    "supertest": "^6.2.2",
+    "typescript": "^4.5.5"
   }
 }

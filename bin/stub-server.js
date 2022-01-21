@@ -10,12 +10,6 @@ const path = require('path');
 
 const { stubServer } = require('../dist/cjs/stubServer');
 
-program
-  .option('-p, --port <port>', 'stub server port', '12345')
-  .option('-c, --config <config>', 'config file', 'stubs/config');
-
-program.parse(process.argv);
-
 // https://en.wikipedia.org/wiki/ANSI_escape_code
 const ESC = {
   Reset: '\u001B[0m',
@@ -25,25 +19,33 @@ const ESC = {
 /** @param {string} text */
 const emphasize = text => `${ESC.Bold}${ESC.Blue}${text}${ESC.Reset}`;
 
-const options = program.opts();
-const config = path.resolve(options.config);
-const host = 'localhost';
-const port = Number(options.port);
+/**
+ * @param {string} config
+ * @param {{ port: string; delay: boolean; }} options
+ */
+function start(config, { port, delay }) {
+  const app = express();
 
-const app = express();
+  // CORS
+  app.use((_req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', '*');
+    next();
+  });
 
-// CORS
-app.use((_req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', '*');
-  next();
-});
+  const server = app.listen(Number(port), 'localhost', () => {
+    const address = /** @type {import('net').AddressInfo} */ (server.address());
+    console.log(
+      `stub-server is running at ${emphasize(`http://${address.address}:${address.port}`)}`
+    );
+  });
 
-const server = app.listen(port, host, () => {
-  const address = /** @type {import('net').AddressInfo} */ (server.address());
-  console.log(
-    `stub-server is running at ${emphasize(`http://${address.address}:${address.port}`)}`
-  );
-});
+  stubServer(path.resolve(config), app, { delay });
+}
 
-stubServer(config, app);
+program
+  .argument('<config>', 'path to the config file')
+  .option('--port <port>', 'stub server port', '12345')
+  .option('--no-delay', 'ignore any delay specified in the config', false)
+  .action((config, options) => start(config, options))
+  .parse();

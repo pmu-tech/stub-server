@@ -1,3 +1,12 @@
+## Next
+
+- Breaking change: CLI config path is now an argument instead of an option
+- Breaking change: remove CLI short options
+- New CLI option --no-delay
+- Fix express peer dependency
+- Improve documentation (JSDoc)
+- Update npm packages
+
 ## 0.6.1 (2021/12/07)
 
 - Improve internal algorithm & unit tests
