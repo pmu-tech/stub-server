@@ -217,14 +217,3 @@ app.prepare().then(() => {
 ## Errors
 
 If an error occurs (missing stub or route) while stub-server is processing a request, the error is returned in the response with status 500 (Internal Server Error) and is also displayed in the console.
-
-## Contributing
-
-### Prerequisites
-
-- Node.js >= 12
-- VSCode extensions: "EditorConfig for VS Code" and "Prettier - Code formatter"
-
-### Build
-
-`npm run build`
