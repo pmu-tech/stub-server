@@ -33,7 +33,7 @@ function start(config, { port, delay }) {
     next();
   });
 
-  const server = app.listen(Number(port), 'localhost', () => {
+  const server = app.listen(Number(port), '0.0.0.0', () => {
     const address = /** @type {import('net').AddressInfo} */ (server.address());
     console.info(
       `stub-server is running at ${emphasize(`http://${address.address}:${address.port}`)}`
