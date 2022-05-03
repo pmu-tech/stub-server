@@ -17,10 +17,10 @@ type Delay = { min: number; max: number };
 
 type CommonConfig = {
   /**
-   * Delay in ms before processing the request.
+   * Random delay (min/max) in ms before processing the request.
    *
-   * Simulates an unreliable network connection.
-   * Help find bugs and possible improvements (add a spinner, disable a submit button...) to your code.
+   * Simulates a slow network connection.
+   * Helps find bugs and possible improvements (add a spinner, disable a submit button...) to your code.
    */
   delay?: Delay;
 

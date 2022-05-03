@@ -15,7 +15,7 @@ For each route, decide what will happen: a JSON stub, a piece of JS or redirect 
 - Can redirect requests to another host thx to [node-http-proxy](https://github.com/http-party/node-http-proxy)
 - No need to restart stub-server if you modify a stub
 - The HTTP status code returned is determined from the stub filename: \*\_200\_\*.json, \*\_500\_\*.html...
-- Configurable delays to simulate slow APIs
+- Configurable delays to simulate slow APIs (helps find bugs and possible improvements to your code - add a spinner, disable a submit button...)
 - Configurable HTTP headers (useful to change origin and bypass CORS for some APIs)
 
 ## Usage
