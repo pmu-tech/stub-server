@@ -27,7 +27,7 @@
     "build:cjs": "tsc --project tsconfig.dist.json --outDir dist/cjs --module commonjs",
     "build": "npm run clean && npm run build:esnext && npm run build:cjs",
     "pretest": "npm run build:cjs",
-    "test": "NODE_ENV=test jest --verbose",
+    "test": "jest --verbose",
     "pretest:coverage": "npm run pretest",
     "test:coverage": "jest --coverage",
     "tsc": "tsc",
