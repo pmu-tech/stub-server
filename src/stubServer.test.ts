@@ -11,7 +11,7 @@ stubServer(configPath, app);
 
 let consoleSpy: jest.SpyInstance;
 beforeEach(() => {
-  consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+  consoleSpy = jest.spyOn(console, 'info').mockImplementation();
 });
 afterEach(() => consoleSpy.mockRestore());
 

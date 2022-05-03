@@ -141,7 +141,7 @@ async function parseConfig(apiPath: string, req: express.Request) {
   const { min, max } = delay ?? routeDelay ?? globalDelay ?? { min: 0, max: 0 };
   const actualDelay = _delay ? await randomDelay(min, max) : 0;
 
-  console.log(`${requestMethod} ${req.url} => ${name}, delay: ${actualDelay} ms`);
+  console.info(`${requestMethod} ${req.url} => ${name}, delay: ${actualDelay} ms`);
 
   return name;
 }

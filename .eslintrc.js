@@ -18,7 +18,7 @@ const config = {
   env: {},
 
   rules: {
-    'no-console': 'off',
+    'no-console': ['error', { allow: ['info', 'error'] }],
     'no-underscore-dangle': 'off',
     'spaced-comment': 'off',
     camelcase: 'off',

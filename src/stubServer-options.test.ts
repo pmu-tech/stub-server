@@ -8,7 +8,7 @@ const configPath = path.resolve(__dirname, 'config-test', 'config');
 
 test('delay option', async () => {
   {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    const consoleSpy = jest.spyOn(console, 'info').mockImplementation();
 
     const app = express();
     stubServer(configPath, app, { delay: true });
@@ -25,7 +25,7 @@ test('delay option', async () => {
   }
 
   {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    const consoleSpy = jest.spyOn(console, 'info').mockImplementation();
 
     const app = express();
     stubServer(configPath, app, { delay: false });
