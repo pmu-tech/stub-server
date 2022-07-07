@@ -12,8 +12,7 @@
     "server",
     "test"
   ],
-  "main": "dist/cjs/stubServer.js",
-  "module": "dist/stubServer.js",
+  "main": "dist/stubServer.js",
   "types": "dist/stubServer.d.ts",
   "files": [
     "dist/"
@@ -23,9 +22,9 @@
   "scripts": {
     "clean": "rm -rf dist coverage",
     "clean:all": "npm run clean && rm -rf node_modules package-lock.json",
-    "build:esnext": "tsc --project tsconfig.dist.json --outDir dist --declaration true",
-    "build:cjs": "tsc --project tsconfig.dist.json --outDir dist/cjs --module commonjs",
-    "build": "npm run clean && npm run build:esnext && npm run build:cjs",
+    "build": "npm run clean && npm run build:dts && npm run build:cjs",
+    "build:dts": "tsc --project tsconfig.dist.json --declaration --emitDeclarationOnly --outDir dist",
+    "build:cjs": "tsc --project tsconfig.dist.json --removeComments --module commonjs --outDir dist",
     "pretest": "npm run build:cjs",
     "test": "jest --verbose",
     "pretest:coverage": "npm run pretest",

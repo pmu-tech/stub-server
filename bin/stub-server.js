@@ -8,7 +8,7 @@ const { program } = require('commander');
 const express = require('express');
 const path = require('path');
 
-const { stubServer } = require('../dist/cjs/stubServer');
+const { stubServer } = require('../dist/stubServer');
 
 // https://en.wikipedia.org/wiki/ANSI_escape_code
 const ESC = {
