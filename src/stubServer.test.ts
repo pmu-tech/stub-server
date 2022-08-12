@@ -349,6 +349,8 @@ describe('proxy', () => {
         .post('/post')
         .attach('image', `${__dirname}/config-test/1x1#000000.png`);
       expect(res.status).toEqual(200);
+      // WTF Sometimes 'x-amzn-trace-id' is present, sometimes not
+      if (!('x-amzn-trace-id' in res.body.headers)) delete response.headers['x-amzn-trace-id'];
       expect(res.body).toEqual(response);
     });
   });
