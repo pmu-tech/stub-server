@@ -96,13 +96,13 @@ import { stubServer } from '@pmu-tech/stub-server';
 
     // webpack 5
     onBeforeSetupMiddleware: ({ app }) => {
-      const configPath = path.resolve(__dirname, 'stubs', 'config');
+      const configPath = path.resolve(__dirname, 'stubs/config');
       stubServer(configPath, app);
     }
 
     // webpack 4
     before: app => {
-      const configPath = path.resolve(__dirname, 'stubs', 'config');
+      const configPath = path.resolve(__dirname, 'stubs/config');
       stubServer(configPath, app);
     }
 
@@ -183,7 +183,7 @@ const path = require('path');
 const app = next({ dev: process.env.NODE_ENV !== 'production' });
 const handle = app.getRequestHandler();
 
-const configPath = path.resolve(__dirname, 'stubs', 'config');
+const configPath = path.resolve(__dirname, 'stubs/config');
 const port = 3000;
 
 app.prepare().then(() => {

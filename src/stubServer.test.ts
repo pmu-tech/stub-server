@@ -5,7 +5,7 @@ import request from 'supertest';
 import * as proxy from './proxy';
 import { stubServer } from './stubServer';
 
-const configPath = path.resolve(__dirname, 'config-test', 'config');
+const configPath = path.resolve(__dirname, 'config-test/config');
 const app = express();
 stubServer(configPath, app);
 

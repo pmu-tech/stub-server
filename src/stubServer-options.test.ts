@@ -4,7 +4,7 @@ import request from 'supertest';
 
 import { stubServer } from './stubServer';
 
-const configPath = path.resolve(__dirname, 'config-test', 'config');
+const configPath = path.resolve(__dirname, 'config-test/config');
 
 test('delay option', async () => {
   {
