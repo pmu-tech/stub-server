@@ -1,6 +1,6 @@
 {
   "name": "@pmu-tech/stub-server",
-  "version": "0.7.0",
+  "version": "0.11.0",
   "description": "Stub server for REST APIs",
   "repository": "github:pmu-tech/stub-server",
   "author": "PMU",
