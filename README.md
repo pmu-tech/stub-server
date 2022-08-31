@@ -46,7 +46,7 @@ webpack.config.ts
 import path from 'path';
 import { StubServerConfig } from '@pmu-tech/stub-server';
 
-const prod = 'https://pmu.fr';
+const prod = 'https://myapp.com';
 
 const stubsPath = path.resolve(__dirname, 'routes');
 
@@ -64,7 +64,7 @@ const config: StubServerConfig = {
       GET: `${stubsPath}/my_api7_GET_200_OK.json`,
       POST: {
         delay: { min: 0, max: 0 },
-        headers: { origin: 'https://pmu.fr' },
+        headers: { origin: prod },
         response: `${stubsPath}/my_api7_POST_200_OK.json`
       }
     },
@@ -74,7 +74,7 @@ const config: StubServerConfig = {
   }
 };
 
-const rootApiPath = 'https://pmu.fr/client/:clientApi';
+const rootApiPath = 'https://myapp.com/client/:clientApi';
 config.routes[`${rootApiPath}/my/api7`] = { GET: `${stubsPath}/my_api7_GET_200_OK.json` };
 
 export default config; // Or "exports.default = config"
