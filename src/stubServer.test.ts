@@ -406,7 +406,7 @@ test('HTTP headers', async () => {
       'accept-encoding': 'gzip, deflate',
       connection: 'close',
       host: expect.any(String),
-      origin: 'http://routeHeaders.com'
+      origin: 'http://GET.com'
     }
   });
 

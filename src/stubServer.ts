@@ -1,6 +1,5 @@
 import express from 'express';
 import fs from 'fs';
-import { IncomingHttpHeaders } from 'http';
 import path from 'path';
 
 import { send } from './proxy';
@@ -8,10 +7,10 @@ import { send } from './proxy';
 // https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
-type URL = string;
 type StubFilename = string;
-type GetStubFilenameFunction = (req: express.Request) => URL | StubFilename;
-type Stub = URL | StubFilename | GetStubFilenameFunction;
+type URL = string;
+export type GetStubFilenameOrUrl = (req: express.Request) => StubFilename | URL;
+type StubOrUrlOrFunction = StubFilename | URL | GetStubFilenameOrUrl;
 
 type Delay = { min: number; max: number };
 
@@ -23,16 +22,11 @@ type CommonConfig = {
    * Helps find bugs and possible improvements (add a spinner, disable a submit button...) to your code.
    */
   delay?: Delay;
-
-  /**
-   * HTTP headers of the request received by the stub server to override.
-   */
-  headers?: IncomingHttpHeaders;
 };
 
 type Response = {
   [requestMethod in RequestMethod]?:
-    | Stub
+    | StubOrUrlOrFunction
     | (CommonConfig & {
         /**
          * The response the stub server will return.
@@ -50,10 +44,10 @@ type Response = {
          *
          * - a URL: the request will be routed there (proxy mode)
          *
-         * - a callback with [req](http://expressjs.com/en/4x/api.html#req) as parameter,
+         * - a function with [req](http://expressjs.com/en/4x/api.html#req) as parameter,
          *   should return a file name or a URL
          */
-        response: Stub;
+        response: StubOrUrlOrFunction;
       });
 };
 
@@ -108,32 +102,32 @@ async function parseConfig(apiPath: string, req: express.Request) {
   // Re-read the config file for each new request so the user
   // don't have to restart the stub server
   // except if he adds a new route which is acceptable
-  const { delay: globalDelay, routes, headers: globalHeaders } = getConfig();
+  const { delay: globalDelay, routes } = getConfig();
 
   const route = routes[apiPath];
 
-  const { delay: routeDelay, headers: routeHeaders, ...responses } = route;
-
-  req.headers = { ...req.headers, ...globalHeaders, ...routeHeaders };
+  const { delay: routeDelay, ...responses } = route;
 
   const requestMethod = req.method as RequestMethod;
-  const stub = responses[requestMethod];
+  const stubOrUrlOrFunction = responses[requestMethod];
 
-  if (stub === undefined) {
+  if (stubOrUrlOrFunction === undefined) {
     throw new Error(`No route for '${requestMethod}' HTTP request method`);
   }
 
-  let name: URL | StubFilename;
+  let stubOrUrl: StubFilename | URL;
   let delay: Delay | undefined;
 
-  if (typeof stub === 'string') {
-    name = stub;
-  } else if (typeof stub === 'function') {
-    name = stub(req);
+  if (typeof stubOrUrlOrFunction === 'string') {
+    stubOrUrl = stubOrUrlOrFunction;
+  } else if (typeof stubOrUrlOrFunction === 'function') {
+    stubOrUrl = stubOrUrlOrFunction(req);
   } else {
-    name = typeof stub.response === 'function' ? stub.response(req) : stub.response;
-    delay = stub.delay;
-    req.headers = { ...req.headers, ...stub.headers };
+    stubOrUrl =
+      typeof stubOrUrlOrFunction.response === 'function'
+        ? stubOrUrlOrFunction.response(req)
+        : stubOrUrlOrFunction.response;
+    delay = stubOrUrlOrFunction.delay;
   }
 
   // Delay the request to simulate network latency
@@ -141,11 +135,12 @@ async function parseConfig(apiPath: string, req: express.Request) {
   const { min, max } = delay ?? routeDelay ?? globalDelay ?? { min: 0, max: 0 };
   const actualDelay = _delay ? await randomDelay(min, max) : 0;
 
-  console.info(`${requestMethod} ${req.url} => ${name}, delay: ${actualDelay} ms`);
+  console.info(`${requestMethod} ${req.url} => ${stubOrUrl}, delay: ${actualDelay} ms`);
 
-  return name;
+  return stubOrUrl;
 }
 
+// Express callback function https://expressjs.com/en/4x/api.html#app.METHOD
 type ExpressHandlerFunction = (req: express.Request, res: express.Response) => void;
 
 async function processStubRequest(
@@ -155,13 +150,13 @@ async function processStubRequest(
   next: express.NextFunction
 ) {
   try {
-    const stubName = await parseConfig(apiPath, req);
+    const stubOrUrl = await parseConfig(apiPath, req);
 
-    if (isUrl(stubName)) {
-      const url = stubName;
+    if (isUrl(stubOrUrl)) {
+      const url = stubOrUrl;
       send(url, req, res, next);
     } else {
-      const filename = stubName;
+      const filename = stubOrUrl;
 
       const match = /_(\d+)_[A-Za-z]+/.exec(filename);
       const httpStatus = match !== null ? Number(match![1]) : 200; // 200: default HTTP status if none specified
@@ -232,7 +227,7 @@ export function stubServer(configPath: string, app: express.Application, options
 
   Object.entries(routes).forEach(([apiPath, route]) => {
     Object.keys(route).forEach(requestMethod => {
-      if (requestMethod !== 'delay' && requestMethod !== 'headers') {
+      if (requestMethod !== 'delay') {
         const method = requestMethod.toLowerCase() as ExpressMethod;
 
         // istanbul ignore next

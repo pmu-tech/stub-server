@@ -1,3 +1,12 @@
+## 0.11.0 (2022/09/08)
+
+- Breaking change: remove `headers` option: use a function with [req](http://expressjs.com/en/4x/api.html#req) as parameter instead
+- Document how to configure stub-server both for stubs and as a proxy
+- Bind to 0.0.0.0 address
+- Improve documentation
+- Rework CommonJS and ESM modules, https://github.com/rollup/rollup/wiki/pkg.module
+- Update npm packages
+
 ## 0.7.0 (2022/01/21)
 
 - Breaking change: CLI config path is now an argument instead of an option
