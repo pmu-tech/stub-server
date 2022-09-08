@@ -5,13 +5,13 @@ import request from 'supertest';
 import * as proxy from './proxy';
 import { stubServer } from './stubServer';
 
-const configPath = path.resolve(__dirname, 'config-test', 'config');
+const configPath = path.resolve(__dirname, 'config-test/config');
 const app = express();
 stubServer(configPath, app);
 
 let consoleSpy: jest.SpyInstance;
 beforeEach(() => {
-  consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+  consoleSpy = jest.spyOn(console, 'info').mockImplementation();
 });
 afterEach(() => consoleSpy.mockRestore());
 
@@ -349,6 +349,8 @@ describe('proxy', () => {
         .post('/post')
         .attach('image', `${__dirname}/config-test/1x1#000000.png`);
       expect(res.status).toEqual(200);
+      // WTF Sometimes 'x-amzn-trace-id' is present, sometimes not
+      if (!('x-amzn-trace-id' in res.body.headers)) delete response.headers['x-amzn-trace-id'];
       expect(res.body).toEqual(response);
     });
   });
@@ -404,7 +406,7 @@ test('HTTP headers', async () => {
       'accept-encoding': 'gzip, deflate',
       connection: 'close',
       host: expect.any(String),
-      origin: 'http://routeHeaders.com'
+      origin: 'http://GET.com'
     }
   });
 

@@ -63,15 +63,21 @@ const config: StubServerConfig = {
       GET: `${stubsPath}/readHttpHeaders.ts`
     },
     '/multiple/methods/headers': {
-      headers: { origin: 'http://routeHeaders.com' },
-      GET: `${stubsPath}/readHttpHeaders.ts`,
+      GET: req => {
+        req.headers.origin = 'http://GET.com';
+        return `${stubsPath}/readHttpHeaders.ts`;
+      },
       POST: {
-        response: `${stubsPath}/readHttpHeaders.ts`,
-        headers: { origin: 'http://POST.com' }
+        response: req => {
+          req.headers.origin = 'http://POST.com';
+          return `${stubsPath}/readHttpHeaders.ts`;
+        }
       },
       PUT: {
-        response: `${stubsPath}/readHttpHeaders.ts`,
-        headers: { origin: 'http://PUT.com' }
+        response: req => {
+          req.headers.origin = 'http://PUT.com';
+          return `${stubsPath}/readHttpHeaders.ts`;
+        }
       }
     },
 

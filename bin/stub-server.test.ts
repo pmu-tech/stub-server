@@ -30,9 +30,7 @@ test('config argument', done => {
 
   const process = spawn(bin, [config]);
   process.stdout.on('data', data => {
-    expect(cleanAnsi(data.toString())).toEqual(
-      'stub-server is running at http://127.0.0.1:12345\n'
-    );
+    expect(cleanAnsi(data.toString())).toEqual('stub-server is running at http://0.0.0.0:12345\n');
   });
   process.stderr.on('data', data => {
     expect(data.toString()).toEqual('Never reached');
@@ -51,7 +49,7 @@ test('port option', done => {
   const process = spawn(bin, [config, '--port', port]);
   process.stdout.on('data', data => {
     expect(cleanAnsi(data.toString())).toEqual(
-      `stub-server is running at http://127.0.0.1:${port}\n`
+      `stub-server is running at http://0.0.0.0:${port}\n`
     );
   });
   process.stderr.on('data', data => {
@@ -70,9 +68,7 @@ test('no-delay option', done => {
 
   const process = spawn(bin, [config, '--no-delay']);
   process.stdout.on('data', data => {
-    expect(cleanAnsi(data.toString())).toEqual(
-      'stub-server is running at http://127.0.0.1:12345\n'
-    );
+    expect(cleanAnsi(data.toString())).toEqual('stub-server is running at http://0.0.0.0:12345\n');
   });
   process.stderr.on('data', data => {
     expect(data.toString()).toEqual('Never reached');
@@ -94,7 +90,7 @@ test('network request', done => {
   const process = spawn(bin, [config, '--port', port]);
   process.stdout.on('data', data => {
     if (data.toString().includes('stub-server is running')) {
-      http.get(`http://localhost:${port}/get/json`, res => {
+      http.get(`http://0.0.0.0:${port}/get/json`, res => {
         let resData = '';
         res.on('data', chunk => {
           resData += chunk;
@@ -139,12 +135,14 @@ test('invalid config argument', done => {
 test('invalid port option', done => {
   expect.assertions(2);
 
-  const process = spawn(bin, [config, '--port', '80']);
+  const process = spawn(bin, [config, '--port', '-1']);
   process.stdout.on('data', data => {
     expect(data.toString()).toEqual('Never reached');
   });
   process.stderr.on('data', data => {
-    expect(data.toString()).toMatch(/Error: listen EACCES: permission denied 127\.0\.0\.1:80/);
+    expect(data.toString()).toMatch(
+      /RangeError \[ERR_SOCKET_BAD_PORT]: options.port should be >= 0 and < 65536. Received -1\./
+    );
   });
   process.on('exit', code => {
     expect(code).toEqual(EXIT_FAILURE);

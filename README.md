@@ -11,12 +11,12 @@ Stub/mock server for REST APIs
 For each route, decide what will happen: a JSON stub, a piece of JS or redirect to a real server
 
 - Use it with Express, [webpack-dev-server](https://github.com/webpack/webpack-dev-server), Next.js or the command line
-- Support stubs written in JSON, JS, TypeScript, HTML, jpg...
+- Supports stubs written in JSON, JS, TypeScript, HTML, jpg...
 - Can redirect requests to another host thx to [node-http-proxy](https://github.com/http-party/node-http-proxy)
 - No need to restart stub-server if you modify a stub
 - The HTTP status code returned is determined from the stub filename: \*\_200\_\*.json, \*\_500\_\*.html...
-- Configurable delays to simulate slow APIs
-- Configurable HTTP headers (useful to change origin and bypass CORS for some APIs)
+- Configurable delays to simulate slow APIs (helps find bugs and possible improvements to your app - add a spinner, disable a submit button...)
+- Access to request & response objects (allows to change headers, request URL...)
 
 ## Usage
 
@@ -46,7 +46,7 @@ webpack.config.ts
 import path from 'path';
 import { StubServerConfig } from '@pmu-tech/stub-server';
 
-const prod = 'https://pmu.fr';
+const prod = 'https://myapp.com';
 
 const stubsPath = path.resolve(__dirname, 'routes');
 
@@ -58,14 +58,20 @@ const config: StubServerConfig = {
     '/my/api3': { POST: `${stubsPath}/my_api3_POST_400_BadRequest-invalidField.ts` },
     '/my/api4': { POST: `${stubsPath}/my_api4_POST_400_BadRequest-invalidField.js` },
     '/my/api5': { DELETE: `${stubsPath}/my_api5_DELETE_500_InternalServerError.html` },
-    '/my/api6/:id': { PUT: prod },
+    '/my/api6/:id': {
+      // Here stub-server works as a proxy,
+      // example of request sent: PUT https://myapp.com/my/api6/132379
+      PUT: prod
+    },
     '/my/api7': {
       delay: { min: 1000, max: 1000 },
       GET: `${stubsPath}/my_api7_GET_200_OK.json`,
       POST: {
         delay: { min: 0, max: 0 },
-        headers: { origin: 'https://pmu.fr' },
-        response: `${stubsPath}/my_api7_POST_200_OK.json`
+        response: req => {
+          req.headers.origin = prod;
+          return `${stubsPath}/my_api7_POST_200_OK.json`;
+        }
       }
     },
     '/my/api8': { GET: `${stubsPath}/my_api8_GET.ts`},
@@ -74,7 +80,7 @@ const config: StubServerConfig = {
   }
 };
 
-const rootApiPath = 'https://pmu.fr/client/:clientApi';
+const rootApiPath = 'https://myapp.com/client/:clientApi';
 config.routes[`${rootApiPath}/my/api7`] = { GET: `${stubsPath}/my_api7_GET_200_OK.json` };
 
 export default config; // Or "exports.default = config"
@@ -89,27 +95,23 @@ Configuration with [webpack-dev-server](https://github.com/webpack/webpack-dev-s
 ```TypeScript
 import { stubServer } from '@pmu-tech/stub-server';
 
-// ...
+...
 
   devServer: {
-    // ...
-
     // webpack 5
     onBeforeSetupMiddleware: ({ app }) => {
-      const configPath = path.resolve(__dirname, 'stubs', 'config');
+      const configPath = path.resolve(__dirname, 'stubs/config');
       stubServer(configPath, app);
     }
 
     // webpack 4
     before: app => {
-      const configPath = path.resolve(__dirname, 'stubs', 'config');
+      const configPath = path.resolve(__dirname, 'stubs/config');
       stubServer(configPath, app);
     }
 
-    // ...
+    ...
   },
-
-// ...
 ```
 
 ### stubs/routes/my_api1_GET_200_OK.json
@@ -181,9 +183,9 @@ const Log = require('next/dist/build/output/log');
 const path = require('path');
 
 const app = next({ dev: process.env.NODE_ENV !== 'production' });
-const handle = app.getRequestHandler();
+const nextjsHandler = app.getRequestHandler();
 
-const configPath = path.resolve(__dirname, 'stubs', 'config');
+const configPath = path.resolve(__dirname, 'stubs/config');
 const port = 3000;
 
 app.prepare().then(() => {
@@ -193,10 +195,14 @@ app.prepare().then(() => {
 
   stubServer(configPath, server);
 
-  server.all('*', (req, res) => handle(req, res));
+  // Next.js only processes GET requests unless you are using [API Routes](https://nextjs.org/docs/api-routes/introduction)
+  server.get('*', (req, res) => nextjsHandler(req, res));
+
+  server.all('*', req => {
+    throw new Error(`'${req.method} ${req.url}' should be declared in stubs/config.ts`);
+  });
 
   server.listen(port, () => {
-    // https://github.com/zeit/next.js/blob/v9.3.1/packages/next/build/output/store.ts#L85-L88
     Log.ready(`ready on port ${port}`);
   });
 });
@@ -205,13 +211,87 @@ app.prepare().then(() => {
 ```JavaScript
 // package.json
 
-{
   "scripts": {
     "dev": "node stubServer.js", // Instead of "next dev"
     "build": "next build",
     "start": "next start"
+    ...
+  },
+```
+
+## How to configure stub-server both for stubs and as a proxy
+
+To "connect" your app to an [environment](https://en.wikipedia.org/wiki/Deployment_environment) (prod, staging, integration...), you can use stub-server as a proxy (intermediary between your app requesting a resource and the server providing that resource).
+
+Why? To configure delays for the HTTP requests (helps find bugs and possible improvements to your app), access to request & response objects...
+
+```JavaScript
+// package.json
+
+  "scripts": {
+    "start": "...",
+    "start:staging": "ENVIRONMENT_NAME=staging npm run start",
+    "start:prod": "ENVIRONMENT_NAME=prod npm run start"
+    ...
+  },
+```
+
+```TypeScript
+// stubs/config.ts
+
+import path from 'path';
+import express from 'express';
+import { GetStubFilenameOrUrl, StubServerConfig } from '@pmu-tech/stub-server';
+
+const stubsPath = path.resolve(__dirname, 'routes');
+
+type Environments = { [name: string]: { target: string; origin: string } | undefined };
+
+const environments: Environments = {
+  staging: {
+    target: 'https://api.staging.myapp.com',
+    origin: 'https://staging.myapp.com'
+  },
+  prod: {
+    target: 'https://api.myapp.com',
+    origin: 'https://myapp.com'
   }
+};
+
+const { target, origin } =
+  environments[process.env.ENVIRONMENT_NAME ?? 'No environment specified'] ?? {};
+
+function configureRequest(stubOrUrl: string): GetStubFilenameOrUrl {
+  return (req: express.Request) => {
+    // You can rewrite the request URL if needed
+    req.url = req.url.replace('/prefix', '');
+
+    if (origin !== undefined) {
+      // May be required for some APIs
+      req.headers.origin = origin;
+    }
+
+    return stubOrUrl;
+  };
 }
+
+const config: StubServerConfig = {
+  delay: { min: 500, max: 3000 },
+  routes: {
+    '/prefix/my/api1': {
+      GET: configureRequest(
+        // Here stub-server works as a proxy,
+        // example of request sent: GET https://api.staging.myapp.com/my/api1
+        target ??
+        // ...or use a stub if no target specified
+        `${stubsPath}/my_api1_GET_200_OK.json`
+      )
+    },
+    ...
+  }
+};
+
+export default config;
 ```
 
 ## Errors
