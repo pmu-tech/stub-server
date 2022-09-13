@@ -294,6 +294,41 @@ const config: StubServerConfig = {
 export default config;
 ```
 
+## Output generated
+
+Examples of output (stdout) for requests processed by stub-server:
+
+```
+GET /account/payment-types?imagesWithUrl=true => stubs/routes/payment-types_200_OK.ts, delay: 442 ms
+GET /account/captcha/1662973203224 => https://api.myapp.com, delay: 0 ms
+GET /account/captcha/1663061235576 => stubs/routes/captcha_200_OK-242674.jpg, delay: 4 ms
+POST /account/create => stubs/routes/account_create_201_Created-no-appro.json, delay: 169 ms
+POST /auth/session?withNotification=true => https://api.myapp.com, delay: 34 ms
+```
+
 ## Errors
 
-If an error occurs (missing stub or route) while stub-server is processing a request, the error is returned in the response with status 500 (Internal Server Error) and is also displayed in the console.
+If the stub is missing or the target is unknown, stub-server returns a 500 (Internal Server Error) response with the error in HTML format and also displays the error in the console.
+
+Examples of errors in the console:
+
+- `ENOENT: no such file or directory, open 'stubs/routes/captcha_200_OK-242674.jpg'`
+- `Error: getaddrinfo ENOTFOUND api.myapp.com`
+
+If you request an unknown route, stub-server does not process it and therefore won't display anything in the console. It's up to you to handle this case with a catch-all route:
+
+```TypeScript
+function missingStubHandler(req: express.Request) {
+  throw new Error(`Missing stub for '${req.method} ${req.url}'`);
+}
+
+...
+
+'/prefix/*': {
+  GET: missingStubHandler,
+  POST: missingStubHandler,
+  PUT: missingStubHandler,
+  PATCH: missingStubHandler,
+  DELETE: missingStubHandler
+}
+```
